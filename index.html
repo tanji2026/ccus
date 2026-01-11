@@ -4,226 +4,227 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>碳吉 TanJi - CCUS 淨零決策模擬器</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Noto Sans TC', sans-serif; overscroll-behavior-y: none; }
-        /* 滑桿樣式 */
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none; height: 28px; width: 28px; border-radius: 50%;
-            background: #ffffff; border: 2px solid currentColor; cursor: pointer; margin-top: -12px;
+            -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%;
+            background: #ffffff; border: 2px solid currentColor; cursor: pointer; margin-top: -10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.1s;
         }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 6px; cursor: pointer; background: #e2e8f0; border-radius: 9999px;
-        }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #e2e8f0; border-radius: 9999px; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .site-card { transition: all 0.2s; }
         .site-card:active { transform: scale(0.96); }
-        .dashboard-enter { animation: slideUp 0.5s ease-out forwards; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        /* 霓虹光暈特效 */
         .glow-text { text-shadow: 0 0 10px rgba(255,255,255,0.5); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 h-[100dvh] flex flex-col overflow-hidden">
 
-    <!-- 頂部導航 -->
-    <nav class="bg-white shadow-sm border-b border-slate-200 flex-none z-30">
-        <div class="container mx-auto px-4 h-14 md:h-16 flex justify-between items-center">
-            <div class="flex items-center gap-2 md:gap-3">
-                <div class="w-8 h-8 md:w-10 md:h-10 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600">
-                    <i data-lucide="leaf" class="w-5 h-5 md:w-6 md:h-6"></i>
-                </div>
-                <div>
-                    <h1 class="text-base md:text-lg font-bold text-slate-800 leading-tight">碳吉 TanJi</h1>
-                    <p class="text-[10px] text-slate-500 font-medium tracking-wider hidden md:block">CCUS 淨零決策模擬器</p>
+    <!-- 登入畫面 -->
+    <div id="login-screen" class="fixed inset-0 bg-slate-900 z-50 flex flex-col items-center justify-center p-6 text-white transition-opacity duration-500">
+        <div class="w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl shadow-emerald-500/50">
+            <i data-lucide="leaf" class="w-8 h-8 text-white"></i>
+        </div>
+        <h1 class="text-3xl font-black mb-2 tracking-tight">碳吉 TanJi</h1>
+        <p class="text-slate-400 mb-8 text-sm">CCUS 淨零決策模擬系統</p>
+        
+        <div class="w-full max-w-sm space-y-4">
+            <div>
+                <label class="text-xs font-bold text-slate-400 uppercase ml-1">小組代碼 (或老師密碼)</label>
+                <input type="text" id="login-team" placeholder="例如：A組" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 text-white font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+            </div>
+            
+            <div id="role-selector">
+                <label class="text-xs font-bold text-slate-400 uppercase ml-1">選擇角色</label>
+                <div class="grid grid-cols-2 gap-2 mt-1">
+                    <button onclick="selectRole('engineer')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group">
+                        <div class="text-xl mb-1">🔧</div>
+                        <div class="text-xs font-bold text-slate-300 group-hover:text-white">環境工程師</div>
+                    </button>
+                    <button onclick="selectRole('cfo')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group">
+                        <div class="text-xl mb-1">💰</div>
+                        <div class="text-xs font-bold text-slate-300 group-hover:text-white">財務長</div>
+                    </button>
+                    <button onclick="selectRole('pr')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group">
+                        <div class="text-xl mb-1">📢</div>
+                        <div class="text-xs font-bold text-slate-300 group-hover:text-white">公關經理</div>
+                    </button>
+                    <button onclick="selectRole('eco')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group">
+                        <div class="text-xl mb-1">🌱</div>
+                        <div class="text-xs font-bold text-slate-300 group-hover:text-white">生態保育員</div>
+                    </button>
+                    <button onclick="selectRole('policy')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group col-span-2">
+                        <div class="text-xl mb-1 flex items-center gap-2">📜 <span class="text-xs bg-emerald-900 text-emerald-400 px-1.5 rounded">隊長</span></div>
+                        <div class="text-xs font-bold text-slate-300 group-hover:text-white">政策分析師</div>
+                    </button>
                 </div>
             </div>
-            <!-- 切換視圖按鈕 -->
-            <div class="flex gap-2">
-                <button onclick="scrollToSection('simulator')" class="text-xs px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-colors">模擬器</button>
-                <button onclick="scrollToSection('dashboard')" class="text-xs px-3 py-1.5 rounded-full bg-slate-800 text-white font-bold flex items-center gap-1 hover:bg-slate-700 transition-colors shadow-lg shadow-slate-900/20">
-                    <div id="connection-status" class="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div> 戰情室
-                </button>
+
+            <button id="start-btn" onclick="enterSimulation()" disabled class="w-full bg-emerald-600 disabled:bg-slate-700 disabled:text-slate-500 text-white py-4 rounded-xl font-bold mt-4 transition-all shadow-lg shadow-emerald-600/20">
+                進入系統
+            </button>
+        </div>
+    </div>
+
+    <!-- 頂部導航 -->
+    <nav class="bg-white shadow-sm border-b border-slate-200 flex-none z-30">
+        <div class="container mx-auto px-4 h-14 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600">
+                    <i data-lucide="leaf" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold text-slate-800">碳吉 TanJi</h1>
+                    <p class="text-[10px] text-slate-500 font-bold" id="header-team-info">未登入</p>
+                </div>
+            </div>
+            <div id="connection-indicator" class="flex items-center gap-1.5 px-2 py-1 bg-slate-100 rounded-full">
+                <div class="w-2 h-2 bg-slate-400 rounded-full"></div>
+                <span class="text-[10px] font-bold text-slate-500">離線</span>
             </div>
         </div>
     </nav>
 
-    <!-- 主內容區 -->
-    <main class="flex-1 overflow-y-auto overflow-x-hidden p-3 md:p-6 no-scrollbar scroll-smooth relative" id="main-scroll">
-        
-        <!-- SECTION 1: 模擬器 -->
-        <div id="section-simulator" class="container mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 min-h-full pb-64 md:pb-48"> <!-- pb 加大給底部輸入框 -->
-            <!-- 左側操作區 -->
-            <div class="md:col-span-7 space-y-4 md:space-y-6">
-                <!-- 1. 場址選擇 -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="px-4 py-3 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
-                        <span class="bg-slate-800 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                        <h2 class="text-sm md:text-base font-bold text-slate-700">選擇場址</h2>
+    <!-- 主內容區 (學生模擬器) -->
+    <main id="main-student" class="flex-1 overflow-y-auto p-4 pb-40 no-scrollbar relative hidden">
+        <!-- 這裡是原本的學生介面代碼，為了節省篇幅，我會保留原本的結構 -->
+        <div class="container mx-auto max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- 左側：決策面板 (同前版) -->
+            <div class="lg:col-span-7 space-y-4">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+                    <div class="px-4 py-2 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                        <h2 class="text-sm font-bold text-slate-700">1. 選址決策</h2>
+                        <span class="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded font-bold">📜 政策分析師</span>
                     </div>
-                    <div class="p-4">
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <button onclick="selectSite('A')" id="btn-A" class="site-card p-3 rounded-xl border-2 border-slate-100 bg-white text-left flex sm:block items-center gap-3">
-                                <div class="w-12 h-12 sm:w-full sm:h-20 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center text-2xl sm:text-4xl shrink-0">🌊</div>
-                                <div><div class="font-bold text-slate-800">A. 外海封存</div><div class="text-xs text-slate-500">Offshore</div></div>
-                            </button>
-                            <button onclick="selectSite('B')" id="btn-B" class="site-card p-3 rounded-xl border-2 border-slate-100 bg-white text-left flex sm:block items-center gap-3">
-                                <div class="w-12 h-12 sm:w-full sm:h-20 rounded-lg bg-amber-50 text-amber-500 flex items-center justify-center text-2xl sm:text-4xl shrink-0">🏭</div>
-                                <div><div class="font-bold text-slate-800">B. 工業區</div><div class="text-xs text-slate-500">Industrial</div></div>
-                            </button>
-                            <button onclick="selectSite('C')" id="btn-C" class="site-card p-3 rounded-xl border-2 border-slate-100 bg-white text-left flex sm:block items-center gap-3">
-                                <div class="w-12 h-12 sm:w-full sm:h-20 rounded-lg bg-emerald-50 text-emerald-500 flex items-center justify-center text-2xl sm:text-4xl shrink-0">⛰️</div>
-                                <div><div class="font-bold text-slate-800">C. 深山地質</div><div class="text-xs text-slate-500">Mountain</div></div>
-                            </button>
-                        </div>
-                        <div id="site-desc" class="mt-3 text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200"></div>
+                    <div class="p-3 grid grid-cols-3 gap-2">
+                        <button onclick="updateTeamState('site', 'A')" id="btn-A" class="site-card p-3 rounded-xl border-2 border-slate-100 text-center"><div class="text-2xl mb-1">🌊</div><div class="text-xs font-bold">外海</div></button>
+                        <button onclick="updateTeamState('site', 'B')" id="btn-B" class="site-card p-3 rounded-xl border-2 border-slate-100 text-center"><div class="text-2xl mb-1">🏭</div><div class="text-xs font-bold">工業區</div></button>
+                        <button onclick="updateTeamState('site', 'C')" id="btn-C" class="site-card p-3 rounded-xl border-2 border-slate-100 text-center"><div class="text-2xl mb-1">⛰️</div><div class="text-xs font-bold">深山</div></button>
                     </div>
+                    <div id="lock-site" class="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center z-10 hidden cursor-not-allowed"><span class="text-xs font-bold text-slate-400 bg-white px-2 py-1 rounded border shadow-sm">🔒 僅分析師可操作</span></div>
                 </div>
 
-                <!-- 2. 參數調整 -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200">
-                    <div class="px-4 py-3 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
-                        <span class="bg-slate-800 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                        <h2 class="text-sm md:text-base font-bold text-slate-700">資源配置</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 relative overflow-hidden">
+                        <div class="flex justify-between mb-2 items-center"><label class="text-sm font-bold text-slate-700 flex gap-1"><i data-lucide="shield-check" class="w-4 h-4 text-blue-500"></i> 安全監測</label><span class="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded font-bold">🔧 工程師</span></div>
+                        <input type="range" min="1" max="5" value="3" id="slider-safety" class="text-blue-500" oninput="updateTeamState('safety', this.value)">
+                        <div class="flex justify-between text-[10px] text-slate-400 mt-2"><span>低</span><span id="val-safety" class="font-bold text-blue-600">標準</span><span>高</span></div>
+                        <div id="lock-safety" class="absolute inset-0 bg-white/60 z-10 hidden"></div>
                     </div>
-                    <div class="p-5 space-y-6">
-                        <div>
-                            <div class="flex justify-between mb-2"><label class="text-sm font-bold text-slate-700 flex gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-blue-500"></i>安全監測</label><span class="text-xs font-bold text-blue-500" id="val-safety">標準</span></div>
-                            <input type="range" min="1" max="5" value="3" class="text-blue-500" id="slider-safety" oninput="updateSimulation()">
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-2"><label class="text-sm font-bold text-slate-700 flex gap-2"><i data-lucide="coins" class="w-4 h-4 text-amber-500"></i>回饋金</label><span class="text-xs font-bold text-amber-500" id="val-money">標準</span></div>
-                            <input type="range" min="1" max="5" value="2" class="text-amber-500" id="slider-money" oninput="updateSimulation()">
-                        </div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 relative overflow-hidden">
+                        <div class="flex justify-between mb-2 items-center"><label class="text-sm font-bold text-slate-700 flex gap-1"><i data-lucide="coins" class="w-4 h-4 text-amber-500"></i> 回饋金</label><span class="text-[10px] bg-amber-100 text-amber-600 px-2 py-0.5 rounded font-bold">📢 公關</span></div>
+                        <input type="range" min="1" max="5" value="2" id="slider-pr" class="text-amber-500" oninput="updateTeamState('pr', this.value)">
+                        <div class="flex justify-between text-[10px] text-slate-400 mt-2"><span>少</span><span id="val-pr" class="font-bold text-amber-600">標準</span><span>多</span></div>
+                        <div id="lock-pr" class="absolute inset-0 bg-white/60 z-10 hidden"></div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 relative overflow-hidden">
+                        <div class="flex justify-between mb-2 items-center"><label class="text-sm font-bold text-slate-700 flex gap-1"><i data-lucide="sprout" class="w-4 h-4 text-emerald-500"></i> 生態補償</label><span class="text-[10px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded font-bold">🌱 生態員</span></div>
+                        <input type="range" min="1" max="5" value="2" id="slider-eco" class="text-emerald-500" oninput="updateTeamState('eco', this.value)">
+                        <div class="flex justify-between text-[10px] text-slate-400 mt-2"><span>基本</span><span id="val-eco" class="font-bold text-emerald-600">標準</span><span>嚴格</span></div>
+                        <div id="lock-eco" class="absolute inset-0 bg-white/60 z-10 hidden"></div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 relative overflow-hidden">
+                        <div class="flex justify-between mb-2 items-center"><label class="text-sm font-bold text-slate-700 flex gap-1"><i data-lucide="piggy-bank" class="w-4 h-4 text-rose-500"></i> 預算緊縮</label><span class="text-[10px] bg-rose-100 text-rose-600 px-2 py-0.5 rounded font-bold">💰 財務長</span></div>
+                        <input type="range" min="1" max="5" value="2" id="slider-cfo" class="text-rose-500" oninput="updateTeamState('cfo', this.value)">
+                        <div class="flex justify-between text-[10px] text-slate-400 mt-2"><span>寬鬆</span><span id="val-cfo" class="font-bold text-rose-600">標準</span><span>嚴格</span></div>
+                        <div id="lock-cfo" class="absolute inset-0 bg-white/60 z-10 hidden"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- 右側儀表板 -->
-            <div class="md:col-span-5 space-y-4">
-                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden relative">
-                    <div class="p-4 bg-slate-50 border-b border-slate-100"><h3 class="font-bold text-center text-slate-800">個人評估 (Your Impact)</h3></div>
-                    <div class="p-4 h-[220px] relative"><canvas id="radarChart"></canvas></div>
-                    <div class="grid grid-cols-3 divide-x divide-slate-100 border-t border-slate-100 bg-slate-50">
-                        <div class="p-2 text-center"><div class="text-[10px] text-slate-400 font-bold">SAFETY</div><div class="text-lg font-black text-blue-600" id="score-safety">0</div></div>
-                        <div class="p-2 text-center"><div class="text-[10px] text-slate-400 font-bold">ECONOMY</div><div class="text-lg font-black text-amber-600" id="score-economy">0</div></div>
-                        <div class="p-2 text-center"><div class="text-[10px] text-slate-400 font-bold">SOCIAL</div><div class="text-lg font-black text-emerald-600" id="score-social">0</div></div>
+            <!-- 右側：儀表板 -->
+            <div class="lg:col-span-5 space-y-4">
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-4">
+                    <div class="flex justify-between items-center mb-2"><h3 class="font-bold text-slate-800">SROI 預測模型</h3><span class="text-[10px] text-slate-400">Team Sync Active</span></div>
+                    <div class="h-[200px] relative"><canvas id="radarChart"></canvas></div>
+                    <div class="mt-3 space-y-1">
+                        <div class="flex justify-between text-xs border-b border-slate-50 pb-1"><span class="text-slate-500">安全性</span><span id="score-safety" class="font-bold text-blue-600">0</span></div>
+                        <div class="flex justify-between text-xs border-b border-slate-50 pb-1"><span class="text-slate-500">經濟性</span><span id="score-economy" class="font-bold text-amber-600">0</span></div>
+                        <div class="flex justify-between text-xs"><span class="text-slate-500">社會性</span><span id="score-social" class="font-bold text-emerald-600">0</span></div>
                     </div>
                 </div>
-                <div class="bg-indigo-50 rounded-2xl border border-indigo-100 p-4">
-                    <h3 class="font-bold text-indigo-900 flex items-center gap-2 mb-2 text-sm"><i data-lucide="bot" class="w-4 h-4"></i> AI 決策分析</h3>
-                    <p id="ai-feedback" class="text-sm text-indigo-800 leading-relaxed">...</p>
-                </div>
-                <div class="h-20 md:hidden"></div>
-            </div>
-        </div>
-
-        <!-- SECTION 2: 全班戰情室 -->
-        <div id="section-dashboard" class="container mx-auto max-w-6xl mt-12 mb-24 hidden dashboard-enter">
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <div class="w-1 h-8 bg-slate-800 rounded-full"></div>
-                    <h2 class="text-2xl font-black text-slate-800">全班決策戰情室</h2>
-                    <div id="mode-badge" class="text-xs bg-orange-500 text-white px-2 py-1 rounded animate-pulse">模擬演示模式 (Mock Mode)</div>
-                </div>
-                <!-- 老師控制台按鈕 (隱藏功能) -->
-                <button onclick="clearData()" title="老師專用：清空所有數據" class="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
-                    <i data-lucide="trash-2" class="w-5 h-5"></i>
-                </button>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                    <h3 class="font-bold text-slate-600 mb-4 text-center">選址分佈 (Site Distribution)</h3>
-                    <div class="h-[200px] relative"><canvas id="pieChart"></canvas></div>
-                    <div class="mt-4 grid grid-cols-3 text-center text-xs">
-                        <div><span class="text-blue-500 font-bold">外海</span><br><span id="count-A">0</span>人</div>
-                        <div><span class="text-amber-500 font-bold">工業區</span><br><span id="count-B">0</span>人</div>
-                        <div><span class="text-emerald-500 font-bold">深山</span><br><span id="count-C">0</span>人</div>
-                    </div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                    <h3 class="font-bold text-slate-600 mb-4 text-center">全班 SROI 平均指標</h3>
-                    <div class="h-[200px] relative"><canvas id="barChart"></canvas></div>
-                </div>
-                <div class="bg-slate-900 text-slate-300 p-5 rounded-2xl shadow-sm border border-slate-800 overflow-hidden flex flex-col">
-                    <h3 class="font-bold text-white mb-4 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4 text-green-400"></i> 最新決策動態</h3>
-                    <div class="flex-1 overflow-y-auto space-y-3 pr-2 text-sm h-[200px]" id="activity-log"></div>
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                    <h4 class="text-xs font-bold text-emerald-400 mb-2 flex items-center gap-1"><i data-lucide="terminal" class="w-3 h-3"></i> 即時協作紀錄</h4>
+                    <div id="system-log" class="text-xs text-slate-400 h-24 overflow-y-auto space-y-1 font-mono">等待連線...</div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- 底部浮動區 (Footer) -->
-    <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-200 p-3 md:p-4 z-50 shadow-[0_-8px_30px_rgba(0,0,0,0.12)]" id="footer-action">
-        <div class="container mx-auto max-w-5xl flex flex-col md:flex-row items-center justify-between gap-3">
-            
-            <!-- 左側：教案資訊 -->
-            <div class="hidden md:block flex-1 text-left opacity-60 hover:opacity-100 transition-opacity">
-                <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Project</div>
-                <div class="text-xs font-medium text-slate-600">115 年度 第二屆 CCUS 創意教案</div>
-            </div>
-
-            <!-- 中間：總分卡片 -->
-            <div class="w-full md:w-auto flex justify-center md:flex-none">
-                <div class="flex flex-col items-center bg-slate-800 text-white px-8 py-2 rounded-2xl shadow-lg border border-slate-700 min-w-[160px] transform md:-translate-y-2 transition-transform hover:scale-105">
-                    <div class="text-[9px] text-emerald-400 font-bold tracking-widest uppercase mb-0.5">SROI 永續績效</div>
-                    <div class="text-4xl md:text-5xl font-black leading-none glow-text tabular-nums" id="footer-score">0.0</div>
+    <!-- 教師總覽戰情室 (Admin Dashboard) -->
+    <main id="main-admin" class="flex-1 overflow-y-auto p-4 md:p-8 no-scrollbar relative hidden bg-slate-900 text-white">
+        <div class="container mx-auto max-w-7xl">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">全班決策總覽 (War Room)</h2>
+                    <p class="text-slate-400 text-sm mt-1">即時監控各組決策動態與 SROI 表現</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
+                        <span class="text-xs text-slate-400 block">在線組數</span>
+                        <span class="text-xl font-bold text-emerald-400" id="admin-team-count">0</span>
+                    </div>
+                    <button onclick="clearAllData()" class="bg-red-500/20 hover:bg-red-500/40 text-red-400 px-4 py-2 rounded-lg border border-red-500/50 transition-colors flex items-center gap-2">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i> 重置課程
+                    </button>
                 </div>
             </div>
 
-            <!-- 右側：輸入名稱與送出按鈕 -->
-            <div class="w-full md:w-auto md:flex-1 flex flex-col items-end gap-2">
-                <div class="flex flex-col sm:flex-row gap-2 w-full justify-end">
-                    <!-- 小組名稱 -->
-                    <div class="relative w-full sm:w-36 group">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                            <i data-lucide="users" class="w-4 h-4"></i>
-                        </div>
-                        <input type="text" id="team-name" placeholder="小組名稱" class="w-full bg-slate-100 border border-slate-200 text-slate-800 text-sm rounded-full pl-9 pr-3 py-2.5 outline-none focus:ring-2 focus:ring-slate-800 transition-all font-bold">
-                    </div>
-                    
-                    <!-- 角色名稱 (新增) -->
-                    <div class="relative w-full sm:w-32 group">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                            <i data-lucide="user" class="w-4 h-4"></i>
-                        </div>
-                        <input type="text" id="role-name" placeholder="角色/名字" class="w-full bg-slate-100 border border-slate-200 text-slate-800 text-sm rounded-full pl-9 pr-3 py-2.5 outline-none focus:ring-2 focus:ring-slate-800 transition-all font-bold">
+            <!-- 全班統計圖表 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                    <h3 class="font-bold text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4"></i> 選址分佈</h3>
+                    <div class="h-[200px] relative"><canvas id="adminPieChart"></canvas></div>
+                </div>
+                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                    <h3 class="font-bold text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-4 h-4"></i> 平均 SROI 指標</h3>
+                    <div class="h-[200px] relative"><canvas id="adminBarChart"></canvas></div>
+                </div>
+                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                    <h3 class="font-bold text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="trophy" class="w-4 h-4"></i> SROI 排行榜</h3>
+                    <div class="overflow-y-auto h-[200px] space-y-2 pr-2" id="leaderboard">
+                        <!-- JS 填入 -->
                     </div>
                 </div>
+            </div>
 
-                <button onclick="submitDecision()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white px-6 md:px-8 py-3 rounded-full font-bold shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all active:scale-95 group border border-emerald-400">
-                    <span id="btn-text" class="text-sm md:text-base whitespace-nowrap">提交決策</span>
-                    <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+            <!-- 各組詳細卡片 -->
+            <h3 class="font-bold text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="grid" class="w-4 h-4"></i> 各組即時狀態</h3>
+            <div id="team-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <!-- JS 動態生成小組卡片 -->
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部操作區 (學生用) -->
+    <div id="student-footer" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-slate-200 p-4 z-40 shadow hidden">
+        <div class="container mx-auto max-w-5xl flex justify-between items-center">
+            <div class="flex flex-col">
+                <div class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">SROI 綜合評分</div>
+                <div class="text-4xl font-black text-slate-800 leading-none tabular-nums" id="footer-score">0.0</div>
+            </div>
+            <div id="submit-wrapper" class="relative">
+                <button onclick="submitFinalDecision()" id="submit-btn" class="bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition-all flex items-center gap-2 active:scale-95">
+                    提交決策 <i data-lucide="send" class="w-4 h-4"></i>
                 </button>
-            </div>
-            
-            <div class="md:hidden text-[10px] text-slate-400 font-medium pt-1 text-center w-full">
-                115 年度 第二屆 CCUS 創意教案
+                <div id="lock-submit" class="absolute inset-0 bg-white/80 backdrop-blur-[1px] flex items-center justify-center rounded-xl cursor-not-allowed hidden">
+                    <span class="text-[10px] font-bold text-slate-500">等待分析師提交</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Firebase 整合腳本 -->
     <script type="module">
-        // 1. 引入 Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp, getDocs, deleteDoc, doc } 
+        import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp, collection, addDoc, getDocs, deleteDoc, query, orderBy } 
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // ============================================
-        //  設定區：已填入您的設定
-        // ============================================
+        // CONFIG (請填入您的設定)
         const firebaseConfig = {
             apiKey: "AIzaSyDMBE9BjTJb70xm8c5WOZaIITxI0PmYWNc",
             authDomain: "tanji-ccus.firebaseapp.com",
@@ -233,308 +234,338 @@
             appId: "1:118576059306:web:8f1c7e87b49d4d388651d3"
         };
 
-        // 狀態變數
-        let db = null;
-        let isFirebaseActive = false;
-        let mockInterval = null;
+        let db, unsubscribe;
+        window.userState = { team: "", role: "" };
+        window.teamState = { site: "A", safety: 3, pr: 2, eco: 2, cfo: 2, lastLog: "" };
+        window.adminMode = false;
 
-        // 2. 初始化 (自動判斷模式)
-        function initApp() {
-            if (firebaseConfig.apiKey) {
-                try {
-                    const app = initializeApp(firebaseConfig);
-                    db = getFirestore(app);
-                    isFirebaseActive = true;
-                    console.log("🔥 Firebase 連線成功！進入即時模式。");
-                    
-                    document.getElementById('mode-badge').className = "text-xs bg-green-500 text-white px-2 py-1 rounded animate-pulse";
-                    document.getElementById('mode-badge').innerText = "Firebase 即時連線 (Live)";
-                    document.getElementById('connection-status').className = "w-2 h-2 bg-green-400 rounded-full animate-pulse";
-                    
-                    listenToDecisions();
-                } catch (e) {
-                    console.error("Firebase 初始化失敗:", e);
-                    fallbackToMock();
-                }
+        // 登入邏輯 (含老師後門)
+        window.selectRole = (role) => {
+            window.userState.role = role;
+            document.querySelectorAll('.role-btn').forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-emerald-500', 'bg-emerald-50');
+                btn.classList.add('bg-slate-800');
+            });
+            event.currentTarget.classList.remove('bg-slate-800');
+            event.currentTarget.classList.add('ring-2', 'ring-emerald-500', 'bg-emerald-900');
+            checkLogin();
+        };
+
+        function checkLogin() {
+            const t = document.getElementById('login-team').value;
+            const btn = document.getElementById('start-btn');
+            
+            // 老師密碼偵測
+            if (t === '880619') {
+                document.getElementById('role-selector').style.display = 'none'; // 隱藏角色選擇
+                btn.innerText = "進入教師戰情室";
+                btn.disabled = false;
+                btn.classList.remove('bg-slate-700', 'text-slate-500');
+                btn.classList.add('bg-blue-600', 'text-white');
+                return;
             } else {
-                fallbackToMock();
+                document.getElementById('role-selector').style.display = 'block';
+                btn.innerText = "進入戰情室";
+            }
+
+            if(t && window.userState.role) {
+                btn.disabled = false;
+                btn.classList.remove('bg-slate-700', 'text-slate-500');
+                btn.classList.add('bg-emerald-600', 'text-white');
             }
         }
+        document.getElementById('login-team').addEventListener('input', checkLogin);
 
-        // 3. 備援模式
-        function fallbackToMock() {
-            isFirebaseActive = false;
-            document.getElementById('mode-badge').className = "text-xs bg-orange-500 text-white px-2 py-1 rounded";
-            document.getElementById('mode-badge').innerText = "模擬演示模式 (Mock)";
-            document.getElementById('connection-status').className = "w-2 h-2 bg-orange-400 rounded-full animate-pulse";
+        window.enterSimulation = () => {
+            const teamInput = document.getElementById('login-team').value.trim();
+            
+            // 初始化 Firebase
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                document.getElementById('login-screen').style.display = 'none';
+
+                // 判斷是否為老師
+                if (teamInput === '880619') {
+                    window.adminMode = true;
+                    initAdminDashboard();
+                } else {
+                    window.userState.team = teamInput;
+                    initStudentView();
+                }
+            } catch(e) {
+                console.error(e);
+                alert("連線錯誤");
+            }
+        };
+
+        // --- 學生端邏輯 ---
+        function initStudentView() {
+            document.getElementById('main-student').classList.remove('hidden');
+            document.getElementById('student-footer').classList.remove('hidden');
+            const roleMap = { 'engineer':'環境工程師', 'cfo':'財務長', 'pr':'公關經理', 'policy':'政策分析師', 'eco':'生態保育員' };
+            document.getElementById('header-team-info').innerText = `${window.userState.team} | ${roleMap[window.userState.role]}`;
+            document.getElementById('connection-indicator').innerHTML = `<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div><span class="text-[10px] font-bold text-green-600">已連線</span>`;
+            
+            applyPermissions();
+            startSync();
         }
 
-        // 4. 監聽數據
-        function listenToDecisions() {
-            if (!db) return;
-            const q = query(collection(db, "decisions"), orderBy("timestamp", "desc"), limit(50));
-            
+        // --- 老師端邏輯 (V13 新增) ---
+        function initAdminDashboard() {
+            document.getElementById('main-admin').classList.remove('hidden');
+            // 監聽所有小組的資料
+            const q = collection(db, "sessions");
             onSnapshot(q, (snapshot) => {
-                const stats = { A: 0, B: 0, C: 0, s: 0, e: 0, o: 0, count: 0 };
-                const logs = [];
-
-                snapshot.forEach((doc) => {
-                    const d = doc.data();
-                    if (stats[d.site] !== undefined) stats[d.site]++;
-                    if (d.scores) {
-                        stats.s += d.scores.s;
-                        stats.e += d.scores.e;
-                        stats.o += d.scores.o;
-                        stats.count++;
-                    }
+                const teams = [];
+                let stats = { A:0, B:0, C:0, s:0, e:0, o:0 };
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const scores = calcScoreStatic(data); // 計算該組分數
+                    teams.push({ id: doc.id, ...data, ...scores });
                     
-                    // 組合顯示名稱：小組名 (角色名)
-                    const displayName = d.role ? `${d.user} (${d.role})` : d.user;
-
-                    logs.push({
-                        user: displayName || "匿名小組",
-                        site: d.site,
-                        time: d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleTimeString() : "Just now"
-                    });
+                    // 統計
+                    if(stats[data.site] !== undefined) stats[data.site]++;
+                    stats.s += scores.s; stats.e += scores.e; stats.o += scores.o;
                 });
 
-                window.classData.siteCounts = { A: stats.A, B: stats.B, C: stats.C };
-                window.classData.scores = stats.count > 0 ? { 
-                    s: Math.round(stats.s / stats.count), 
-                    e: Math.round(stats.e / stats.count), 
-                    o: Math.round(stats.o / stats.count) 
-                } : { s: 0, e: 0, o: 0 };
-                window.classData.log = logs;
-                updateDashboardUI();
-                
-            }, (error) => {
-                console.error("監聽失敗:", error);
-                fallbackToMock();
+                document.getElementById('admin-team-count').innerText = teams.length;
+                updateAdminCharts(teams, stats);
+                renderTeamCards(teams);
+                renderLeaderboard(teams);
             });
         }
 
-        // 5. 送出數據
-        window.submitDecision = async function() {
-            const btn = document.querySelector('#footer-action button');
-            const nameInput = document.getElementById('team-name');
-            const roleInput = document.getElementById('role-name'); // 新增角色欄位
+        // 老師端：渲染小組卡片
+        function renderTeamCards(teams) {
+            const container = document.getElementById('team-cards');
+            container.innerHTML = '';
+            teams.forEach(t => {
+                const siteIcon = t.site === 'A' ? '🌊' : (t.site === 'B' ? '🏭' : '⛰️');
+                const card = document.createElement('div');
+                card.className = "bg-slate-800 p-4 rounded-xl border border-slate-700 hover:border-emerald-500 transition-colors";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-white">${t.id}</span>
+                        <span class="text-xs bg-slate-700 px-2 py-1 rounded">${siteIcon}</span>
+                    </div>
+                    <div class="flex justify-between text-xs text-slate-400 mb-2">
+                        <span>SROI: <span class="text-emerald-400 font-bold text-lg">${t.total}</span></span>
+                    </div>
+                    <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                        <div class="bg-emerald-500 h-full" style="width: ${t.total}%"></div>
+                    </div>
+                    <div class="text-[10px] text-slate-500 mt-2 truncate">最後更新: ${t.lastLog || '無'}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
 
-            // 預設名稱邏輯
-            const defaultNames = ["永續先鋒", "綠色騎士", "減碳小隊", "未來能源", "地球衛士"];
-            const randomName = defaultNames[Math.floor(Math.random() * defaultNames.length)] + "_" + Math.floor(Math.random()*100);
+        // 老師端：排行榜
+        function renderLeaderboard(teams) {
+            const list = document.getElementById('leaderboard');
+            list.innerHTML = '';
+            // 按 SROI 排序
+            teams.sort((a,b) => parseFloat(b.total) - parseFloat(a.total)).forEach((t, i) => {
+                const row = document.createElement('div');
+                row.className = "flex justify-between items-center bg-slate-700/50 p-2 rounded text-xs";
+                row.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold ${i<3 ? 'text-yellow-400':'text-slate-500'}">#${i+1}</span>
+                        <span class="text-slate-300">${t.id}</span>
+                    </div>
+                    <span class="font-mono text-emerald-400 font-bold">${t.total}</span>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        // 老師端：清除所有資料
+        window.clearAllData = async () => {
+            if(confirm("確定要重置所有小組數據嗎？")) {
+                const q = query(collection(db, "sessions"));
+                const snapshot = await getDocs(q);
+                await Promise.all(snapshot.docs.map(doc => deleteDoc(doc.ref)));
+                // 也清除 decisions
+                const q2 = query(collection(db, "decisions"));
+                const snapshot2 = await getDocs(q2);
+                await Promise.all(snapshot2.docs.map(doc => deleteDoc(doc.ref)));
+                alert("課程已重置！");
+            }
+        };
+
+        // 學生端：同步邏輯
+        function startSync() {
+            const ref = doc(db, "sessions", window.userState.team);
+            unsubscribe = onSnapshot(ref, (snap) => {
+                if(snap.exists()) {
+                    const data = snap.data();
+                    window.teamState = { ...window.teamState, ...data };
+                    updateUI(); 
+                    calcScore(); 
+                    if(data.lastLog) addLog(data.lastLog);
+                } else {
+                    setDoc(ref, window.teamState);
+                }
+            });
+        }
+
+        window.updateTeamState = async (key, val) => {
+            window.teamState[key] = val;
+            calcScore();
+            updateUI();
             
-            const teamName = nameInput.value.trim() || randomName;
-            const roleName = roleInput.value.trim(); // 可為空
+            const roleMap = { 'engineer':'工程師', 'cfo':'財務長', 'pr':'公關', 'policy':'分析師', 'eco':'生態員' };
+            const logMsg = `${roleMap[window.userState.role]} 調整了參數`;
 
-            const originalText = btn.innerHTML;
-            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 上傳中...`;
-            lucide.createIcons();
+            if(db) {
+                const ref = doc(db, "sessions", window.userState.team);
+                await setDoc(ref, {
+                    [key]: val,
+                    lastLog: logMsg,
+                    timestamp: serverTimestamp()
+                }, { merge: true });
+            }
+        };
 
-            const currentScore = {
-                s: parseInt(document.getElementById('score-safety').innerText),
-                e: parseInt(document.getElementById('score-economy').innerText),
-                o: parseInt(document.getElementById('score-social').innerText)
-            };
+        function updateUI() {
+            const s = window.teamState;
+            setSlider('safety', s.safety);
+            setSlider('pr', s.pr);
+            setSlider('eco', s.eco);
+            setSlider('cfo', s.cfo);
             
-            const payload = {
-                site: window.state.site,
-                scores: currentScore,
-                user: teamName,
-                role: roleName, // 新增欄位
-                timestamp: isFirebaseActive ? serverTimestamp() : new Date()
-            };
+            ['A','B','C'].forEach(site => {
+                const btn = document.getElementById(`btn-${site}`);
+                if(site === s.site) {
+                    btn.className = "site-card p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 ring-2 ring-emerald-200 text-center";
+                } else {
+                    btn.className = "site-card p-3 rounded-xl border-2 border-slate-100 text-center opacity-60";
+                }
+            });
+        }
+        function setSlider(id, val) {
+            const el = document.getElementById(`slider-${id}`);
+            if(el) el.value = val;
+            const labels = ['低','偏低','標準','偏高','高'];
+            const txt = document.getElementById(`val-${id}`);
+            if(txt) txt.innerText = labels[val-1] || '標準';
+        }
 
+        function addLog(msg) {
+            const log = document.getElementById('system-log');
+            const div = document.createElement('div');
+            div.innerText = `> ${msg}`;
+            log.prepend(div);
+        }
+
+        function applyPermissions() {
+            const r = window.userState.role;
+            if(r !== 'engineer') lockUI('safety');
+            if(r !== 'pr') lockUI('pr');
+            if(r !== 'eco') lockUI('eco');
+            if(r !== 'cfo') lockUI('cfo');
+            if(r !== 'policy') {
+                document.getElementById('lock-site').classList.remove('hidden');
+                document.getElementById('lock-submit').classList.remove('hidden');
+            }
+        }
+        function lockUI(id) {
+            document.getElementById(`slider-${id}`).disabled = true;
+            document.getElementById(`lock-${id}`).classList.remove('hidden');
+        }
+
+        window.submitFinalDecision = async () => {
+            const btn = document.getElementById('submit-btn');
+            btn.innerHTML = "傳送中...";
             try {
-                if (isFirebaseActive && db) {
-                    await addDoc(collection(db, "decisions"), payload);
-                    console.log("數據已寫入 Firebase");
-                } else {
-                    console.log("模擬寫入:", payload);
-                    await new Promise(r => setTimeout(r, 800));
-                    window.startLiveSimulation(); 
-                }
-
-                btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> 已送出`;
-                btn.className = "w-full sm:w-auto bg-slate-700 text-white px-6 md:px-8 py-3 rounded-full font-bold shadow-none flex items-center justify-center gap-2 cursor-default pointer-events-none opacity-50";
-                
-                document.getElementById('section-dashboard').classList.remove('hidden');
-                setTimeout(() => {
-                    document.getElementById('section-dashboard').scrollIntoView({ behavior: 'smooth' });
-                }, 500);
-
-            } catch (error) {
-                console.error("上傳失敗", error);
-                alert("上傳失敗：請檢查網路或 Firebase 權限");
-                btn.innerHTML = originalText;
-            }
-        };
-
-        // 6. 清除數據 (Admin Function)
-        window.clearData = async function() {
-            const pwd = prompt("【老師專用功能】\n請輸入密碼以清空全班數據：", "");
-            if (pwd !== "880619") { 
-                if(pwd !== null) alert("密碼錯誤！");
-                return;
-            }
-
-            if (isFirebaseActive && db) {
-                if(confirm("確定要刪除資料庫中的所有決策紀錄嗎？此動作無法復原！")) {
-                    try {
-                        const q = query(collection(db, "decisions"));
-                        const snapshot = await getDocs(q);
-                        const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
-                        await Promise.all(deletePromises);
-                        alert("資料庫已清空！");
-                    } catch (e) {
-                        alert("刪除失敗：" + e.message);
-                    }
-                }
-            } else {
-                window.classData.siteCounts = { A: 0, B: 0, C: 0 };
-                window.classData.scores = { s: 0, e: 0, o: 0 };
-                window.classData.log = [];
-                updateDashboardUI();
-                alert("模擬數據已重置！");
-            }
-        };
-
-        initApp();
-    </script>
-
-    <!-- 原有的邏輯腳本 -->
-    <script>
-        lucide.createIcons();
-        const sites = { 'A': { name: '外海', desc: '遠離居住區，無鄰避問題，但海底管線成本極高。', base: { s: 85, e: 20, o: 95 } }, 'B': { name: '工業區', desc: '運輸成本低，但鄰避風險高，需極高的溝通成本。', base: { s: 50, e: 95, o: 15 } }, 'C': { name: '深山', desc: '地質穩定，但可能破壞生態，需權衡環保議題。', base: { s: 70, e: 60, o: 55 } } };
-        
-        window.state = { site: 'A', safety: 3, money: 2 };
-        window.classData = { siteCounts: { 'A': 12, 'B': 8, 'C': 5 }, scores: { s: 75, e: 60, o: 65 }, log: [] };
-        
-        let radarChart = null;
-        let pieChart = null, barChart = null;
-        let isSimulationRunning = false;
-
-        window.onload = function() {
-            initRadar();
-            selectSite('A');
-            initDashboardCharts();
-            renderLog();
-        };
-
-        function selectSite(id) {
-            window.state.site = id;
-            ['A','B','C'].forEach(s => {
-                const btn = document.getElementById(`btn-${s}`);
-                if (s === id) {
-                    btn.className = "site-card p-3 rounded-xl border-2 bg-emerald-50 border-emerald-500 text-left flex sm:block items-center gap-3 ring-2 ring-emerald-200";
-                } else {
-                    btn.className = "site-card p-3 rounded-xl border-2 border-slate-100 bg-white text-left flex sm:block items-center gap-3 opacity-70 hover:opacity-100";
-                }
-            });
-            document.getElementById('site-desc').innerText = sites[id].desc;
-            updateSimulation();
+                await addDoc(collection(db, "decisions"), {
+                    site: window.teamState.site,
+                    scores: calcScore(true),
+                    user: window.userState.team,
+                    timestamp: serverTimestamp()
+                });
+                alert("已送出至戰情室！");
+                btn.innerHTML = "已送出";
+                btn.disabled = true;
+            } catch(e) { alert("上傳失敗"); }
         }
 
-        function updateSimulation() {
-            window.state.safety = parseInt(document.getElementById('slider-safety').value);
-            window.state.money = parseInt(document.getElementById('slider-money').value);
-            const labels = ['低', '低', '標準', '高', '高'];
-            document.getElementById('val-safety').innerText = labels[window.state.safety-1];
-            document.getElementById('val-money').innerText = labels[window.state.money-1];
-            const base = sites[window.state.site].base;
-            let s = Math.min(100, base.s + (window.state.safety * 5));
-            let e = Math.max(10, base.e - (Math.pow(window.state.safety, 1.2)*5) - (window.state.money*8));
-            let o = Math.min(100, Math.max(0, base.o + (window.state.money*10)));
-            if(window.state.site === 'B' && s < 70) o -= 20;
-            document.getElementById('score-safety').innerText = parseInt(s);
-            document.getElementById('score-economy').innerText = parseInt(e);
-            document.getElementById('score-social').innerText = parseInt(o);
+        // 共用計分邏輯 (靜態版給 Admin 用)
+        const sites = { 'A': {s:85,e:20,o:95}, 'B': {s:50,e:95,o:15}, 'C': {s:70,e:60,o:55} };
+        function calcScoreStatic(st) {
+            const base = sites[st.site].base;
+            let s = Math.min(100, Math.max(0, base.s + (st.safety * 5) + (st.eco * 2) - (st.cfo * 3)));
+            if(st.site === 'B') s -= 10;
+            let cost = (Math.pow(st.safety, 1.2)*3) + (st.pr * 5) + (st.eco * 4);
+            let e = Math.min(100, Math.max(0, base.e + (st.cfo * 8) - cost));
+            let o = Math.min(100, Math.max(0, base.o + (st.pr * 8) + (st.eco * 3) - (st.cfo * 2)));
+            if(st.site === 'B' && s < 60) o -= 20;
             const total = ((s*0.4)+(e*0.25)+(o*0.35)).toFixed(1);
-            document.getElementById('footer-score').innerText = total;
-            radarChart.data.datasets[0].data = [s, e, o];
-            radarChart.update();
-            let msg = "方案平衡。";
-            if(s<60) msg = "⚠️ 安全性過低，環評風險大。";
-            else if(o<50) msg = "📢 居民抗爭風險高，請增加回饋。";
-            else if(e<30) msg = "💰 成本過高，財務不可行。";
-            document.getElementById('ai-feedback').innerText = msg;
+            return { s, e, o, total };
         }
 
-        function initRadar() {
-            const ctx = document.getElementById('radarChart').getContext('2d');
-            radarChart = new Chart(ctx, {
-                type: 'radar',
-                data: { labels: ['安全性', '經濟', '社會'], datasets: [{ data: [50,50,50], backgroundColor: 'rgba(16,185,129,0.2)', borderColor: '#10b981', borderWidth: 2 }] },
-                options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { display: false } } }, plugins: { legend: { display: false } } }
-            });
+        // 學生端動態計分
+        let chart;
+        function calcScore(ret=false) {
+            const res = calcScoreStatic(window.teamState);
+            if(!ret) {
+                document.getElementById('score-safety').innerText = parseInt(res.s);
+                document.getElementById('score-economy').innerText = parseInt(res.e);
+                document.getElementById('score-social').innerText = parseInt(res.o);
+                document.getElementById('footer-score').innerText = res.total;
+                if(chart) {
+                    chart.data.datasets[0].data = [res.s, res.e, res.o];
+                    chart.update();
+                }
+            }
+            return res;
         }
 
-        function scrollToSection(id) {
-            const el = document.getElementById(`section-${id}`);
-            if(el) { el.classList.remove('hidden'); el.scrollIntoView({ behavior: 'smooth' }); }
+        // 老師端圖表
+        let adminPie, adminBar;
+        function updateAdminCharts(teams, stats) {
+            const count = teams.length || 1;
+            // Pie
+            if(!adminPie) {
+                const ctx = document.getElementById('adminPieChart').getContext('2d');
+                adminPie = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: { labels: ['外海','工業','深山'], datasets:[{data:[0,0,0], backgroundColor:['#3b82f6','#f59e0b','#10b981'], borderColor:'#1e293b'}] },
+                    options: { plugins: { legend: { labels: { color: '#cbd5e1' } } } }
+                });
+            }
+            adminPie.data.datasets[0].data = [stats.A, stats.B, stats.C];
+            adminPie.update();
+
+            // Bar
+            if(!adminBar) {
+                const ctx = document.getElementById('adminBarChart').getContext('2d');
+                adminBar = new Chart(ctx, {
+                    type: 'bar',
+                    data: { labels: ['安全','經濟','社會'], datasets:[{label:'全班平均', data:[0,0,0], backgroundColor:['#3b82f6','#f59e0b','#10b981']}] },
+                    options: { 
+                        scales: { y: { beginAtZero:true, max:100, grid:{color:'#334155'}, ticks:{color:'#94a3b8'} }, x: { grid:{display:false}, ticks:{color:'#94a3b8'} } },
+                        plugins: { legend: { display:false } }
+                    }
+                });
+            }
+            adminBar.data.datasets[0].data = [stats.s/count, stats.e/count, stats.o/count];
+            adminBar.update();
         }
 
-        function initDashboardCharts() {
-            const ctxPie = document.getElementById('pieChart').getContext('2d');
-            pieChart = new Chart(ctxPie, {
-                type: 'doughnut',
-                data: { labels: ['外海', '工業區', '深山'], datasets: [{ data: [12, 8, 5], backgroundColor: ['#3b82f6', '#f59e0b', '#10b981'] }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
-            });
-            const ctxBar = document.getElementById('barChart').getContext('2d');
-            barChart = new Chart(ctxBar, {
-                type: 'bar',
-                data: { labels: ['平均安全', '平均經濟', '平均社會'], datasets: [{ label: '全班平均', data: [75, 60, 65], backgroundColor: ['rgba(59,130,246,0.7)', 'rgba(245,158,11,0.7)', 'rgba(16,185,129,0.7)'], borderRadius: 5 }] },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } }, plugins: { legend: { display: false } } }
-            });
-        }
-
-        window.updateDashboardUI = function() {
-            pieChart.data.datasets[0].data = [
-                window.classData.siteCounts.A, 
-                window.classData.siteCounts.B, 
-                window.classData.siteCounts.C
-            ];
-            pieChart.update();
-
-            barChart.data.datasets[0].data = [
-                window.classData.scores.s, 
-                window.classData.scores.e, 
-                window.classData.scores.o
-            ];
-            barChart.update();
-
-            document.getElementById('count-A').innerText = window.classData.siteCounts.A;
-            document.getElementById('count-B').innerText = window.classData.siteCounts.B;
-            document.getElementById('count-C').innerText = window.classData.siteCounts.C;
-            
-            renderLog();
-        }
-
-        function renderLog() {
-            const logEl = document.getElementById('activity-log');
-            logEl.innerHTML = '';
-            window.classData.log.slice(0, 20).forEach(entry => {
-                const newLog = document.createElement('div');
-                newLog.className = "flex justify-between items-center border-b border-slate-800 pb-2";
-                const color = entry.site === 'A' ? 'text-blue-400' : (entry.site === 'B' ? 'text-amber-400' : 'text-emerald-400');
-                const siteName = entry.site === 'A' ? '外海' : (entry.site === 'B' ? '工業區' : '深山');
-                newLog.innerHTML = `<div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-slate-500"></div><span>${entry.user}</span></div><div class="${color} font-bold text-xs">${siteName}</div>`;
-                logEl.appendChild(newLog);
-            });
-        }
-
-        window.startLiveSimulation = function() {
-            if (isSimulationRunning) return;
-            isSimulationRunning = true;
-            setInterval(() => {
-                const randomSite = ['A', 'B', 'C'][Math.floor(Math.random() * 3)];
-                const randomUser = `同學_${Math.floor(Math.random()*90 + 10)}`;
-                window.classData.siteCounts[randomSite]++;
-                window.classData.scores.s += (Math.random()*10 - 5);
-                window.classData.log.unshift({ user: randomUser, site: randomSite, time: "Now" });
-                updateDashboardUI();
-            }, 3000);
-        }
+        window.onload = () => {
+            if(document.getElementById('radarChart')) {
+                const ctx = document.getElementById('radarChart').getContext('2d');
+                chart = new Chart(ctx, {
+                    type: 'radar',
+                    data: { labels: ['安全性', '經濟', '社會'], datasets: [{ data: [50,50,50], backgroundColor: 'rgba(16,185,129,0.2)', borderColor: '#10b981', borderWidth: 2 }] },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { display: false } } }, plugins: { legend: { display: false } } }
+                });
+            }
+            lucide.createIcons();
+        };
     </script>
 </body>
 </html>
