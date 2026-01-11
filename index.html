@@ -266,7 +266,7 @@
             checkLoginInput();
         };
 
-        // 即時檢查輸入框：按下按鈕前就給反饋 (但保持低調)
+        // 即時檢查輸入框：按下按鈕前就給反饋
         async function checkLoginInput() {
             const t = document.getElementById('login-team').value.trim();
             const btn = document.getElementById('start-btn');
@@ -282,11 +282,11 @@
             const isAdmin = await checkPasscode(t);
             
             if (isAdmin) {
-                // 是老師 -> 改變按鈕顏色 (藍色) 和文字提示
+                // 是老師 -> 改變按鈕顏色 (綠色) 和文字提示
                 document.getElementById('role-selector').style.display = 'none'; // 老師不用選角色
                 btn.disabled = false;
-                btn.className = "w-full bg-blue-600 text-white py-4 rounded-xl font-bold mt-4 transition-all shadow-lg shadow-blue-600/20";
-                btn.innerText = "進入教師戰情室";
+                btn.className = "w-full bg-emerald-600 text-white py-4 rounded-xl font-bold mt-4 transition-all shadow-lg shadow-emerald-600/20";
+                btn.innerText = "進入戰情室";
                 return;
             } else {
                 document.getElementById('role-selector').style.display = 'block';
