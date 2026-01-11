@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="robots" content="noindex,nofollow">
     <title>碳吉 TanJi - CCUS 淨零決策模擬器</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -53,7 +52,7 @@
             <div class="flex gap-2">
                 <button onclick="scrollToSection('simulator')" class="text-xs px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-colors">模擬器</button>
                 <button onclick="scrollToSection('dashboard')" class="text-xs px-3 py-1.5 rounded-full bg-slate-800 text-white font-bold flex items-center gap-1 hover:bg-slate-700 transition-colors shadow-lg shadow-slate-900/20">
-                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div> 戰情室
+                    <div id="connection-status" class="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div> 戰情室
                 </button>
             </div>
         </div>
@@ -134,11 +133,11 @@
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-1 h-8 bg-slate-800 rounded-full"></div>
                 <h2 class="text-2xl font-black text-slate-800">全班決策戰情室</h2>
-                <span class="text-xs bg-red-500 text-white px-2 py-1 rounded animate-pulse">LIVE</span>
+                <div id="mode-badge" class="text-xs bg-orange-500 text-white px-2 py-1 rounded animate-pulse">模擬演示模式 (Mock Mode)</div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                    <h3 class="font-bold text-slate-600 mb-4 text-center">選址分佈</h3>
+                    <h3 class="font-bold text-slate-600 mb-4 text-center">選址分佈 (Site Distribution)</h3>
                     <div class="h-[200px] relative"><canvas id="pieChart"></canvas></div>
                     <div class="mt-4 grid grid-cols-3 text-center text-xs">
                         <div><span class="text-blue-500 font-bold">外海</span><br><span id="count-A">0</span>人</div>
@@ -158,17 +157,17 @@
         </div>
     </main>
 
-    <!-- 底部浮動區 (Footer) - V6.0 置中優化版 -->
+    <!-- 底部浮動區 (Footer) -->
     <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-200 p-3 md:p-4 z-50 shadow-[0_-8px_30px_rgba(0,0,0,0.12)]" id="footer-action">
         <div class="container mx-auto max-w-5xl flex flex-col md:flex-row items-center justify-between gap-3">
             
-            <!-- 左側：教案資訊 (電腦版) / 留空以平衡佈局 -->
+            <!-- 左側：教案資訊 -->
             <div class="hidden md:block flex-1 text-left opacity-60 hover:opacity-100 transition-opacity">
                 <div class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Project</div>
                 <div class="text-xs font-medium text-slate-600">115 年度 第二屆 CCUS 創意教案</div>
             </div>
 
-            <!-- 中間：總分卡片 (絕對置中) -->
+            <!-- 中間：總分卡片 -->
             <div class="w-full md:w-auto flex justify-center md:flex-none">
                 <div class="flex flex-col items-center bg-slate-800 text-white px-8 py-2 rounded-2xl shadow-lg border border-slate-700 min-w-[160px] transform md:-translate-y-2 transition-transform hover:scale-105">
                     <div class="text-[9px] text-emerald-400 font-bold tracking-widest uppercase mb-0.5">SROI 永續績效</div>
@@ -176,7 +175,7 @@
                 </div>
             </div>
 
-            <!-- 右側：送出按鈕 (電腦版靠右, 手機版在下方) -->
+            <!-- 右側：送出按鈕 -->
             <div class="w-full md:w-auto md:flex-1 flex justify-end">
                 <button onclick="submitDecision()" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 text-white px-6 md:px-8 py-3.5 rounded-full font-bold shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all active:scale-95 group border border-emerald-400">
                     <span id="btn-text" class="text-sm md:text-base">提交決策</span>
@@ -184,19 +183,190 @@
                 </button>
             </div>
             
-            <!-- 手機版底部補充資訊 -->
             <div class="md:hidden text-[10px] text-slate-400 font-medium pt-1">
                 115 年度 第二屆 CCUS 創意教案
             </div>
         </div>
     </div>
 
+    <!-- Firebase 整合腳本 -->
+    <!-- type="module" 允許我們使用 import 語法引入 Firebase SDK -->
+    <script type="module">
+        // 1. 引入 Firebase SDK (使用 CDN 模組)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp } 
+        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // ============================================
+        //  設定區：請在此填入您的 Firebase 設定 (Config)
+        // ============================================
+        const firebaseConfig = {
+            // 請將您的 Firebase 設定貼在這裡
+            // apiKey: "AIzaSy...",
+            // authDomain: "your-project.firebaseapp.com",
+            // projectId: "your-project",
+            // storageBucket: "your-project.appspot.com",
+            // messagingSenderId: "...",
+            // appId: "..."
+        };
+
+        // 狀態變數
+        let db = null;
+        let isFirebaseActive = false;
+        let mockInterval = null;
+
+        // 2. 初始化 (自動判斷模式)
+        function initApp() {
+            // 檢查是否已填寫 Config (判斷 apiKey 是否存在)
+            if (firebaseConfig.apiKey) {
+                try {
+                    const app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    isFirebaseActive = true;
+                    console.log("🔥 Firebase 連線成功！進入即時模式。");
+                    
+                    // UI 更新
+                    document.getElementById('mode-badge').className = "text-xs bg-green-500 text-white px-2 py-1 rounded animate-pulse";
+                    document.getElementById('mode-badge').innerText = "Firebase 即時連線 (Live)";
+                    document.getElementById('connection-status').className = "w-2 h-2 bg-green-400 rounded-full animate-pulse";
+                    
+                    // 啟動監聽
+                    listenToDecisions();
+                } catch (e) {
+                    console.error("Firebase 初始化失敗:", e);
+                    fallbackToMock();
+                }
+            } else {
+                console.log("⚠️ 未檢測到 Firebase Config，進入模擬演示模式。");
+                fallbackToMock();
+            }
+        }
+
+        // 3. 備援模式 (Mock Mode) - 當沒有 Firebase 時使用假資料
+        function fallbackToMock() {
+            isFirebaseActive = false;
+            // UI 更新
+            document.getElementById('mode-badge').className = "text-xs bg-orange-500 text-white px-2 py-1 rounded";
+            document.getElementById('mode-badge').innerText = "模擬演示模式 (Mock)";
+            document.getElementById('connection-status').className = "w-2 h-2 bg-orange-400 rounded-full animate-pulse";
+        }
+
+        // 4. 監聽數據 (Firebase Reader)
+        function listenToDecisions() {
+            if (!db) return;
+            
+            // 監聽 'decisions' 集合，按時間倒序，取最新 50 筆
+            const q = query(collection(db, "decisions"), orderBy("timestamp", "desc"), limit(50));
+            
+            onSnapshot(q, (snapshot) => {
+                // 重置統計數據
+                const stats = { A: 0, B: 0, C: 0, s: 0, e: 0, o: 0, count: 0 };
+                const logs = [];
+
+                snapshot.forEach((doc) => {
+                    const d = doc.data();
+                    // 累加選址
+                    if (stats[d.site] !== undefined) stats[d.site]++;
+                    // 累加分數
+                    stats.s += d.scores.s;
+                    stats.e += d.scores.e;
+                    stats.o += d.scores.o;
+                    stats.count++;
+                    
+                    // 日誌數據
+                    logs.push({
+                        user: d.user || "匿名規劃師",
+                        site: d.site,
+                        time: d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleTimeString() : "Just now"
+                    });
+                });
+
+                // 更新全域資料 (讓圖表重繪)
+                if (stats.count > 0) {
+                    window.classData.siteCounts = { A: stats.A, B: stats.B, C: stats.C };
+                    window.classData.scores = { 
+                        s: Math.round(stats.s / stats.count), 
+                        e: Math.round(stats.e / stats.count), 
+                        o: Math.round(stats.o / stats.count) 
+                    };
+                    window.classData.log = logs; // Firebase 已經排序好了
+                    
+                    // 觸發圖表更新
+                    updateDashboardUI(); 
+                }
+            });
+        }
+
+        // 5. 送出數據 (Firebase Writer)
+        // 為了讓外部 HTML onclick 能呼叫，需掛載到 window
+        window.submitDecision = async function() {
+            const btn = document.querySelector('#footer-action button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 上傳中...`;
+            lucide.createIcons();
+
+            // 準備數據
+            const currentScore = {
+                s: parseInt(document.getElementById('score-safety').innerText),
+                e: parseInt(document.getElementById('score-economy').innerText),
+                o: parseInt(document.getElementById('score-social').innerText)
+            };
+            
+            const payload = {
+                site: window.state.site, // 從全域變數讀取
+                scores: currentScore,
+                user: `學生_${Math.floor(Math.random()*999)}`, // 實務上可讓學生輸入名字
+                timestamp: isFirebaseActive ? serverTimestamp() : new Date()
+            };
+
+            try {
+                if (isFirebaseActive && db) {
+                    // 寫入 Firebase
+                    await addDoc(collection(db, "decisions"), payload);
+                    console.log("數據已寫入 Firebase");
+                } else {
+                    // 寫入假資料 (Mock)
+                    console.log("模擬寫入:", payload);
+                    // 模擬延遲
+                    await new Promise(r => setTimeout(r, 800));
+                    // 觸發模擬戰情室
+                    window.startLiveSimulation(); 
+                }
+
+                // UI 回饋
+                btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> 已送出`;
+                btn.className = "w-full md:w-auto bg-slate-700 text-white px-6 md:px-8 py-3.5 rounded-full font-bold shadow-none flex items-center justify-center gap-2 cursor-default pointer-events-none";
+                
+                // 顯示戰情室
+                document.getElementById('section-dashboard').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('section-dashboard').scrollIntoView({ behavior: 'smooth' });
+                }, 500);
+
+            } catch (error) {
+                console.error("上傳失敗", error);
+                alert("上傳失敗，請檢查網路連線");
+                btn.innerHTML = originalText;
+            }
+        };
+
+        // 啟動
+        initApp();
+
+    </script>
+
+    <!-- 原有的邏輯腳本 (UI操作、圖表繪製) -->
     <script>
         lucide.createIcons();
         const sites = { 'A': { name: '外海', desc: '遠離居住區，無鄰避問題，但海底管線成本極高。', base: { s: 85, e: 20, o: 95 } }, 'B': { name: '工業區', desc: '運輸成本低，但鄰避風險高，需極高的溝通成本。', base: { s: 50, e: 95, o: 15 } }, 'C': { name: '深山', desc: '地質穩定，但可能破壞生態，需權衡環保議題。', base: { s: 70, e: 60, o: 55 } } };
-        let state = { site: 'A', safety: 3, money: 2 };
+        
+        // 將 state 掛載到 window 讓 Module 讀取
+        window.state = { site: 'A', safety: 3, money: 2 };
+        
+        // 將 classData 掛載到 window 讓 Firebase 更新
+        window.classData = { siteCounts: { 'A': 12, 'B': 8, 'C': 5 }, scores: { s: 75, e: 60, o: 65 }, log: [] };
+        
         let radarChart = null;
-        let classData = { siteCounts: { 'A': 12, 'B': 8, 'C': 5 }, scores: { s: 75, e: 60, o: 65 }, log: [{ user: 'Student_01', site: 'A', time: '10:02' }, { user: 'Student_02', site: 'B', time: '10:05' }] };
         let pieChart = null, barChart = null;
         let isSimulationRunning = false;
 
@@ -207,8 +377,9 @@
             renderLog();
         };
 
+        // ... (保留原有的 UI 操作函式) ...
         function selectSite(id) {
-            state.site = id;
+            window.state.site = id; // 更新全域狀態
             ['A','B','C'].forEach(s => {
                 const btn = document.getElementById(`btn-${s}`);
                 if (s === id) {
@@ -222,16 +393,16 @@
         }
 
         function updateSimulation() {
-            state.safety = parseInt(document.getElementById('slider-safety').value);
-            state.money = parseInt(document.getElementById('slider-money').value);
+            window.state.safety = parseInt(document.getElementById('slider-safety').value);
+            window.state.money = parseInt(document.getElementById('slider-money').value);
             const labels = ['低', '低', '標準', '高', '高'];
-            document.getElementById('val-safety').innerText = labels[state.safety-1];
-            document.getElementById('val-money').innerText = labels[state.money-1];
-            const base = sites[state.site].base;
-            let s = Math.min(100, base.s + (state.safety * 5));
-            let e = Math.max(10, base.e - (Math.pow(state.safety, 1.2)*5) - (state.money*8));
-            let o = Math.min(100, Math.max(0, base.o + (state.money*10)));
-            if(state.site === 'B' && s < 70) o -= 20;
+            document.getElementById('val-safety').innerText = labels[window.state.safety-1];
+            document.getElementById('val-money').innerText = labels[window.state.money-1];
+            const base = sites[window.state.site].base;
+            let s = Math.min(100, base.s + (window.state.safety * 5));
+            let e = Math.max(10, base.e - (Math.pow(window.state.safety, 1.2)*5) - (window.state.money*8));
+            let o = Math.min(100, Math.max(0, base.o + (window.state.money*10)));
+            if(window.state.site === 'B' && s < 70) o -= 20;
             document.getElementById('score-safety').innerText = parseInt(s);
             document.getElementById('score-economy').innerText = parseInt(e);
             document.getElementById('score-social').innerText = parseInt(o);
@@ -246,6 +417,7 @@
             document.getElementById('ai-feedback').innerText = msg;
         }
 
+        // ... (Chart 初始化) ...
         function initRadar() {
             const ctx = document.getElementById('radarChart').getContext('2d');
             radarChart = new Chart(ctx, {
@@ -253,21 +425,6 @@
                 data: { labels: ['安全性', '經濟', '社會'], datasets: [{ data: [50,50,50], backgroundColor: 'rgba(16,185,129,0.2)', borderColor: '#10b981', borderWidth: 2 }] },
                 options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { display: false } } }, plugins: { legend: { display: false } } }
             });
-        }
-
-        function submitDecision() {
-            const btn = document.querySelector('#footer-action button');
-            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 上傳中...`;
-            lucide.createIcons();
-            setTimeout(() => {
-                btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> 已送出`;
-                btn.className = "w-full md:w-auto bg-slate-700 text-white px-6 md:px-8 py-3.5 rounded-full font-bold shadow-none flex items-center justify-center gap-2 cursor-default";
-                document.getElementById('section-dashboard').classList.remove('hidden');
-                setTimeout(() => {
-                    document.getElementById('section-dashboard').scrollIntoView({ behavior: 'smooth' });
-                    if(!isSimulationRunning) startLiveSimulation();
-                }, 500);
-            }, 1000);
         }
 
         function scrollToSection(id) {
@@ -290,10 +447,38 @@
             });
         }
 
+        // 這是讓 Firebase 或 Mock 呼叫的更新函式
+        window.updateDashboardUI = function() {
+            // 更新圓餅圖
+            pieChart.data.datasets[0].data = [
+                window.classData.siteCounts.A, 
+                window.classData.siteCounts.B, 
+                window.classData.siteCounts.C
+            ];
+            pieChart.update();
+
+            // 更新長條圖
+            barChart.data.datasets[0].data = [
+                window.classData.scores.s, 
+                window.classData.scores.e, 
+                window.classData.scores.o
+            ];
+            barChart.update();
+
+            // 更新下方數字
+            document.getElementById('count-A').innerText = window.classData.siteCounts.A;
+            document.getElementById('count-B').innerText = window.classData.siteCounts.B;
+            document.getElementById('count-C').innerText = window.classData.siteCounts.C;
+            
+            // 更新 Log
+            renderLog();
+        }
+
         function renderLog() {
             const logEl = document.getElementById('activity-log');
             logEl.innerHTML = '';
-            classData.log.forEach(entry => {
+            // 顯示最新 10 筆
+            window.classData.log.slice(0, 20).forEach(entry => {
                 const newLog = document.createElement('div');
                 newLog.className = "flex justify-between items-center border-b border-slate-800 pb-2";
                 const color = entry.site === 'A' ? 'text-blue-400' : (entry.site === 'B' ? 'text-amber-400' : 'text-emerald-400');
@@ -303,26 +488,17 @@
             });
         }
 
-        function startLiveSimulation() {
+        // 這是舊的模擬函式，當沒 Firebase 時才會被呼叫
+        window.startLiveSimulation = function() {
+            if (isSimulationRunning) return;
             isSimulationRunning = true;
             setInterval(() => {
                 const randomSite = ['A', 'B', 'C'][Math.floor(Math.random() * 3)];
                 const randomUser = `同學_${Math.floor(Math.random()*90 + 10)}`;
-                classData.siteCounts[randomSite]++;
-                classData.scores.s += (Math.random()*10 - 5);
-                pieChart.data.datasets[0].data = [classData.siteCounts.A, classData.siteCounts.B, classData.siteCounts.C];
-                pieChart.update();
-                const logEl = document.getElementById('activity-log');
-                const newLog = document.createElement('div');
-                newLog.className = "flex justify-between items-center border-b border-slate-800 pb-2 animate-pulse";
-                const color = randomSite === 'A' ? 'text-blue-400' : (randomSite === 'B' ? 'text-amber-400' : 'text-emerald-400');
-                const siteName = randomSite === 'A' ? '外海' : (randomSite === 'B' ? '工業區' : '深山');
-                newLog.innerHTML = `<div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-slate-500"></div><span>${randomUser}</span></div><div class="${color} font-bold text-xs">${siteName}</div>`;
-                logEl.insertBefore(newLog, logEl.firstChild);
-                if(logEl.children.length > 10) logEl.removeChild(logEl.lastChild);
-                document.getElementById('count-A').innerText = classData.siteCounts.A;
-                document.getElementById('count-B').innerText = classData.siteCounts.B;
-                document.getElementById('count-C').innerText = classData.siteCounts.C;
+                window.classData.siteCounts[randomSite]++;
+                window.classData.scores.s += (Math.random()*10 - 5);
+                window.classData.log.unshift({ user: randomUser, site: randomSite, time: "Now" });
+                updateDashboardUI();
             }, 3000);
         }
     </script>
