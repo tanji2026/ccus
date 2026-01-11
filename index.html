@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="robots" content="noindex,nofollow">
     <title>碳吉 TanJi - CCUS 淨零決策模擬器</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -63,7 +62,7 @@
     <main class="flex-1 overflow-y-auto overflow-x-hidden p-3 md:p-6 no-scrollbar scroll-smooth relative" id="main-scroll">
         
         <!-- SECTION 1: 模擬器 -->
-        <div id="section-simulator" class="container mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 min-h-full pb-36">
+        <div id="section-simulator" class="container mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 min-h-full pb-48"> <!-- pb 加大給底部輸入框 -->
             <!-- 左側操作區 -->
             <div class="md:col-span-7 space-y-4 md:space-y-6">
                 <!-- 1. 場址選擇 -->
@@ -131,11 +130,18 @@
 
         <!-- SECTION 2: 全班戰情室 -->
         <div id="section-dashboard" class="container mx-auto max-w-6xl mt-12 mb-24 hidden dashboard-enter">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-1 h-8 bg-slate-800 rounded-full"></div>
-                <h2 class="text-2xl font-black text-slate-800">全班決策戰情室</h2>
-                <div id="mode-badge" class="text-xs bg-orange-500 text-white px-2 py-1 rounded animate-pulse">模擬演示模式 (Mock Mode)</div>
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-1 h-8 bg-slate-800 rounded-full"></div>
+                    <h2 class="text-2xl font-black text-slate-800">全班決策戰情室</h2>
+                    <div id="mode-badge" class="text-xs bg-orange-500 text-white px-2 py-1 rounded animate-pulse">模擬演示模式 (Mock Mode)</div>
+                </div>
+                <!-- 老師控制台按鈕 (隱藏功能) -->
+                <button onclick="clearData()" title="老師專用：清空所有數據" class="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
+                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                </button>
             </div>
+            
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
                     <h3 class="font-bold text-slate-600 mb-4 text-center">選址分佈 (Site Distribution)</h3>
@@ -176,15 +182,23 @@
                 </div>
             </div>
 
-            <!-- 右側：送出按鈕 -->
-            <div class="w-full md:w-auto md:flex-1 flex justify-end">
-                <button onclick="submitDecision()" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 text-white px-6 md:px-8 py-3.5 rounded-full font-bold shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all active:scale-95 group border border-emerald-400">
-                    <span id="btn-text" class="text-sm md:text-base">提交決策</span>
+            <!-- 右側：輸入名稱與送出按鈕 -->
+            <div class="w-full md:w-auto md:flex-1 flex flex-col md:flex-row justify-end items-center gap-2">
+                <!-- 小組名稱輸入框 -->
+                <div class="relative w-full md:w-48 group">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                    </div>
+                    <input type="text" id="team-name" placeholder="輸入小組名稱" class="w-full bg-slate-100 border border-slate-200 text-slate-800 text-sm rounded-full pl-9 pr-3 py-3 md:py-3.5 focus:ring-2 focus:ring-slate-800 focus:border-transparent outline-none transition-all placeholder:text-slate-400 font-bold" maxlength="10">
+                </div>
+
+                <button onclick="submitDecision()" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-500 text-white px-6 md:px-8 py-3 md:py-3.5 rounded-full font-bold shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all active:scale-95 group border border-emerald-400">
+                    <span id="btn-text" class="text-sm md:text-base whitespace-nowrap">提交決策</span>
                     <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
                 </button>
             </div>
             
-            <div class="md:hidden text-[10px] text-slate-400 font-medium pt-1">
+            <div class="md:hidden text-[10px] text-slate-400 font-medium pt-1 text-center">
                 115 年度 第二屆 CCUS 創意教案
             </div>
         </div>
@@ -194,7 +208,7 @@
     <script type="module">
         // 1. 引入 Firebase SDK (使用 CDN 模組)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp } 
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp, getDocs, deleteDoc, doc } 
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // ============================================
@@ -267,25 +281,24 @@
                     }
                     
                     logs.push({
-                        user: d.user || "匿名規劃師",
+                        user: d.user || "匿名小組",
                         site: d.site,
                         time: d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleTimeString() : "Just now"
                     });
                 });
 
-                if (stats.count > 0) {
-                    window.classData.siteCounts = { A: stats.A, B: stats.B, C: stats.C };
-                    window.classData.scores = { 
-                        s: Math.round(stats.s / stats.count), 
-                        e: Math.round(stats.e / stats.count), 
-                        o: Math.round(stats.o / stats.count) 
-                    };
-                    window.classData.log = logs;
-                    updateDashboardUI(); 
-                }
+                // 更新全域資料 (即使沒資料也要清空圖表)
+                window.classData.siteCounts = { A: stats.A, B: stats.B, C: stats.C };
+                window.classData.scores = stats.count > 0 ? { 
+                    s: Math.round(stats.s / stats.count), 
+                    e: Math.round(stats.e / stats.count), 
+                    o: Math.round(stats.o / stats.count) 
+                } : { s: 0, e: 0, o: 0 };
+                window.classData.log = logs;
+                updateDashboardUI();
+                
             }, (error) => {
                 console.error("監聽失敗:", error);
-                // 如果權限過期或網路斷線，退回模擬模式
                 fallbackToMock();
             });
         }
@@ -293,6 +306,12 @@
         // 5. 送出數據 (Firebase Writer)
         window.submitDecision = async function() {
             const btn = document.querySelector('#footer-action button');
+            const nameInput = document.getElementById('team-name');
+            // 預設名稱邏輯
+            const defaultNames = ["永續先鋒", "綠色騎士", "減碳小隊", "未來能源", "地球衛士"];
+            const randomName = defaultNames[Math.floor(Math.random() * defaultNames.length)] + "_" + Math.floor(Math.random()*100);
+            const userName = nameInput.value.trim() || randomName;
+
             const originalText = btn.innerHTML;
             btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 上傳中...`;
             lucide.createIcons();
@@ -306,7 +325,7 @@
             const payload = {
                 site: window.state.site,
                 scores: currentScore,
-                user: `學生_${Math.floor(Math.random()*999)}`,
+                user: userName,
                 timestamp: isFirebaseActive ? serverTimestamp() : new Date()
             };
 
@@ -321,7 +340,7 @@
                 }
 
                 btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> 已送出`;
-                btn.className = "w-full md:w-auto bg-slate-700 text-white px-6 md:px-8 py-3.5 rounded-full font-bold shadow-none flex items-center justify-center gap-2 cursor-default pointer-events-none";
+                btn.className = "w-full md:w-auto bg-slate-700 text-white px-6 md:px-8 py-3 md:py-3.5 rounded-full font-bold shadow-none flex items-center justify-center gap-2 cursor-default pointer-events-none opacity-50";
                 
                 document.getElementById('section-dashboard').classList.remove('hidden');
                 setTimeout(() => {
@@ -332,6 +351,36 @@
                 console.error("上傳失敗", error);
                 alert("上傳失敗：請檢查網路或 Firebase 權限");
                 btn.innerHTML = originalText;
+            }
+        };
+
+        // 6. 清除數據 (Admin Function) - 密碼已更新
+        window.clearData = async function() {
+            const pwd = prompt("【老師專用功能】\n請輸入密碼以清空全班數據：", "");
+            if (pwd !== "880619") { // 密碼檢查
+                if(pwd !== null) alert("密碼錯誤！");
+                return;
+            }
+
+            if (isFirebaseActive && db) {
+                if(confirm("確定要刪除資料庫中的所有決策紀錄嗎？此動作無法復原！")) {
+                    try {
+                        const q = query(collection(db, "decisions"));
+                        const snapshot = await getDocs(q);
+                        const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
+                        await Promise.all(deletePromises);
+                        alert("資料庫已清空！");
+                    } catch (e) {
+                        alert("刪除失敗：" + e.message);
+                    }
+                }
+            } else {
+                // Mock Mode 清除
+                window.classData.siteCounts = { A: 0, B: 0, C: 0 };
+                window.classData.scores = { s: 0, e: 0, o: 0 };
+                window.classData.log = [];
+                updateDashboardUI();
+                alert("模擬數據已重置！");
             }
         };
 
