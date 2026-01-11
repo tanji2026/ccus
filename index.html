@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex,nofollow">
     <title>碳吉 TanJi - CCUS 淨零決策模擬器</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -190,7 +191,6 @@
     </div>
 
     <!-- Firebase 整合腳本 -->
-    <!-- type="module" 允許我們使用 import 語法引入 Firebase SDK -->
     <script type="module">
         // 1. 引入 Firebase SDK (使用 CDN 模組)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -198,16 +198,15 @@
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // ============================================
-        //  設定區：請在此填入您的 Firebase 設定 (Config)
+        //  設定區：已自動填入您的設定
         // ============================================
         const firebaseConfig = {
-            // 請將您的 Firebase 設定貼在這裡
-            // apiKey: "AIzaSy...",
-            // authDomain: "your-project.firebaseapp.com",
-            // projectId: "your-project",
-            // storageBucket: "your-project.appspot.com",
-            // messagingSenderId: "...",
-            // appId: "..."
+            apiKey: "AIzaSyDMBE9BjTJb70xm8c5WOZaIITxI0PmYWNc",
+            authDomain: "tanji-ccus.firebaseapp.com",
+            projectId: "tanji-ccus",
+            storageBucket: "tanji-ccus.firebasestorage.app",
+            messagingSenderId: "118576059306",
+            appId: "1:118576059306:web:8f1c7e87b49d4d388651d3"
         };
 
         // 狀態變數
@@ -217,7 +216,6 @@
 
         // 2. 初始化 (自動判斷模式)
         function initApp() {
-            // 檢查是否已填寫 Config (判斷 apiKey 是否存在)
             if (firebaseConfig.apiKey) {
                 try {
                     const app = initializeApp(firebaseConfig);
@@ -237,15 +235,13 @@
                     fallbackToMock();
                 }
             } else {
-                console.log("⚠️ 未檢測到 Firebase Config，進入模擬演示模式。");
                 fallbackToMock();
             }
         }
 
-        // 3. 備援模式 (Mock Mode) - 當沒有 Firebase 時使用假資料
+        // 3. 備援模式 (Mock Mode)
         function fallbackToMock() {
             isFirebaseActive = false;
-            // UI 更新
             document.getElementById('mode-badge').className = "text-xs bg-orange-500 text-white px-2 py-1 rounded";
             document.getElementById('mode-badge').innerText = "模擬演示模式 (Mock)";
             document.getElementById('connection-status').className = "w-2 h-2 bg-orange-400 rounded-full animate-pulse";
@@ -254,26 +250,22 @@
         // 4. 監聽數據 (Firebase Reader)
         function listenToDecisions() {
             if (!db) return;
-            
-            // 監聽 'decisions' 集合，按時間倒序，取最新 50 筆
             const q = query(collection(db, "decisions"), orderBy("timestamp", "desc"), limit(50));
             
             onSnapshot(q, (snapshot) => {
-                // 重置統計數據
                 const stats = { A: 0, B: 0, C: 0, s: 0, e: 0, o: 0, count: 0 };
                 const logs = [];
 
                 snapshot.forEach((doc) => {
                     const d = doc.data();
-                    // 累加選址
                     if (stats[d.site] !== undefined) stats[d.site]++;
-                    // 累加分數
-                    stats.s += d.scores.s;
-                    stats.e += d.scores.e;
-                    stats.o += d.scores.o;
-                    stats.count++;
+                    if (d.scores) {
+                        stats.s += d.scores.s;
+                        stats.e += d.scores.e;
+                        stats.o += d.scores.o;
+                        stats.count++;
+                    }
                     
-                    // 日誌數據
                     logs.push({
                         user: d.user || "匿名規劃師",
                         site: d.site,
@@ -281,7 +273,6 @@
                     });
                 });
 
-                // 更新全域資料 (讓圖表重繪)
                 if (stats.count > 0) {
                     window.classData.siteCounts = { A: stats.A, B: stats.B, C: stats.C };
                     window.classData.scores = { 
@@ -289,23 +280,23 @@
                         e: Math.round(stats.e / stats.count), 
                         o: Math.round(stats.o / stats.count) 
                     };
-                    window.classData.log = logs; // Firebase 已經排序好了
-                    
-                    // 觸發圖表更新
+                    window.classData.log = logs;
                     updateDashboardUI(); 
                 }
+            }, (error) => {
+                console.error("監聽失敗:", error);
+                // 如果權限過期或網路斷線，退回模擬模式
+                fallbackToMock();
             });
         }
 
         // 5. 送出數據 (Firebase Writer)
-        // 為了讓外部 HTML onclick 能呼叫，需掛載到 window
         window.submitDecision = async function() {
             const btn = document.querySelector('#footer-action button');
             const originalText = btn.innerHTML;
             btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 上傳中...`;
             lucide.createIcons();
 
-            // 準備數據
             const currentScore = {
                 s: parseInt(document.getElementById('score-safety').innerText),
                 e: parseInt(document.getElementById('score-economy').innerText),
@@ -313,31 +304,25 @@
             };
             
             const payload = {
-                site: window.state.site, // 從全域變數讀取
+                site: window.state.site,
                 scores: currentScore,
-                user: `學生_${Math.floor(Math.random()*999)}`, // 實務上可讓學生輸入名字
+                user: `學生_${Math.floor(Math.random()*999)}`,
                 timestamp: isFirebaseActive ? serverTimestamp() : new Date()
             };
 
             try {
                 if (isFirebaseActive && db) {
-                    // 寫入 Firebase
                     await addDoc(collection(db, "decisions"), payload);
                     console.log("數據已寫入 Firebase");
                 } else {
-                    // 寫入假資料 (Mock)
                     console.log("模擬寫入:", payload);
-                    // 模擬延遲
                     await new Promise(r => setTimeout(r, 800));
-                    // 觸發模擬戰情室
                     window.startLiveSimulation(); 
                 }
 
-                // UI 回饋
                 btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> 已送出`;
                 btn.className = "w-full md:w-auto bg-slate-700 text-white px-6 md:px-8 py-3.5 rounded-full font-bold shadow-none flex items-center justify-center gap-2 cursor-default pointer-events-none";
                 
-                // 顯示戰情室
                 document.getElementById('section-dashboard').classList.remove('hidden');
                 setTimeout(() => {
                     document.getElementById('section-dashboard').scrollIntoView({ behavior: 'smooth' });
@@ -345,25 +330,20 @@
 
             } catch (error) {
                 console.error("上傳失敗", error);
-                alert("上傳失敗，請檢查網路連線");
+                alert("上傳失敗：請檢查網路或 Firebase 權限");
                 btn.innerHTML = originalText;
             }
         };
 
-        // 啟動
         initApp();
-
     </script>
 
-    <!-- 原有的邏輯腳本 (UI操作、圖表繪製) -->
+    <!-- 原有的邏輯腳本 -->
     <script>
         lucide.createIcons();
         const sites = { 'A': { name: '外海', desc: '遠離居住區，無鄰避問題，但海底管線成本極高。', base: { s: 85, e: 20, o: 95 } }, 'B': { name: '工業區', desc: '運輸成本低，但鄰避風險高，需極高的溝通成本。', base: { s: 50, e: 95, o: 15 } }, 'C': { name: '深山', desc: '地質穩定，但可能破壞生態，需權衡環保議題。', base: { s: 70, e: 60, o: 55 } } };
         
-        // 將 state 掛載到 window 讓 Module 讀取
         window.state = { site: 'A', safety: 3, money: 2 };
-        
-        // 將 classData 掛載到 window 讓 Firebase 更新
         window.classData = { siteCounts: { 'A': 12, 'B': 8, 'C': 5 }, scores: { s: 75, e: 60, o: 65 }, log: [] };
         
         let radarChart = null;
@@ -377,9 +357,8 @@
             renderLog();
         };
 
-        // ... (保留原有的 UI 操作函式) ...
         function selectSite(id) {
-            window.state.site = id; // 更新全域狀態
+            window.state.site = id;
             ['A','B','C'].forEach(s => {
                 const btn = document.getElementById(`btn-${s}`);
                 if (s === id) {
@@ -417,7 +396,6 @@
             document.getElementById('ai-feedback').innerText = msg;
         }
 
-        // ... (Chart 初始化) ...
         function initRadar() {
             const ctx = document.getElementById('radarChart').getContext('2d');
             radarChart = new Chart(ctx, {
@@ -447,9 +425,7 @@
             });
         }
 
-        // 這是讓 Firebase 或 Mock 呼叫的更新函式
         window.updateDashboardUI = function() {
-            // 更新圓餅圖
             pieChart.data.datasets[0].data = [
                 window.classData.siteCounts.A, 
                 window.classData.siteCounts.B, 
@@ -457,7 +433,6 @@
             ];
             pieChart.update();
 
-            // 更新長條圖
             barChart.data.datasets[0].data = [
                 window.classData.scores.s, 
                 window.classData.scores.e, 
@@ -465,19 +440,16 @@
             ];
             barChart.update();
 
-            // 更新下方數字
             document.getElementById('count-A').innerText = window.classData.siteCounts.A;
             document.getElementById('count-B').innerText = window.classData.siteCounts.B;
             document.getElementById('count-C').innerText = window.classData.siteCounts.C;
             
-            // 更新 Log
             renderLog();
         }
 
         function renderLog() {
             const logEl = document.getElementById('activity-log');
             logEl.innerHTML = '';
-            // 顯示最新 10 筆
             window.classData.log.slice(0, 20).forEach(entry => {
                 const newLog = document.createElement('div');
                 newLog.className = "flex justify-between items-center border-b border-slate-800 pb-2";
@@ -488,7 +460,6 @@
             });
         }
 
-        // 這是舊的模擬函式，當沒 Firebase 時才會被呼叫
         window.startLiveSimulation = function() {
             if (isSimulationRunning) return;
             isSimulationRunning = true;
