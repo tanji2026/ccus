@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>碳吉 TanJi - CCUS 淨零決策模擬器</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Noto Sans TC', sans-serif; overscroll-behavior-y: none; }
+        /* 滑桿樣式優化 */
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%;
@@ -38,8 +43,7 @@
         <div class="w-full max-w-sm space-y-4">
             <div>
                 <label class="text-xs font-bold text-slate-400 uppercase ml-1">小組名稱 / 課程代碼</label>
-                <input type="text" id="login-team" placeholder="輸入小組名" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 text-white font-bold focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
-                <p class="text-[10px] text-slate-500 mt-1">* 老師請輸入專用代碼登入戰情室</p>
+                <input type="text" id="login-team" placeholder="輸入小組名 (或代碼)" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 text-white font-bold focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
             </div>
             
             <div id="role-selector">
@@ -68,9 +72,8 @@
                 </div>
             </div>
 
-            <!-- 按鈕 id 保持不變，但在 JS 中會動態改變文字 -->
-            <button id="start-btn" onclick="enterSimulation()" disabled class="w-full bg-emerald-600 disabled:bg-slate-700 disabled:text-slate-500 text-white py-4 rounded-xl font-bold mt-4 transition-all shadow-lg shadow-emerald-600/20">
-                進入系統
+            <button id="start-btn" onclick="enterSimulation()" disabled class="w-full bg-slate-700 text-slate-500 py-4 rounded-xl font-bold mt-4 transition-all shadow-lg">
+                請輸入小組名稱
             </button>
         </div>
     </div>
@@ -110,6 +113,7 @@
                         <button onclick="updateTeamState('site', 'B')" id="btn-B" class="site-card p-3 rounded-xl border-2 border-slate-100 text-center"><div class="text-2xl mb-1">🏭</div><div class="text-xs font-bold">工業區</div></button>
                         <button onclick="updateTeamState('site', 'C')" id="btn-C" class="site-card p-3 rounded-xl border-2 border-slate-100 text-center"><div class="text-2xl mb-1">⛰️</div><div class="text-xs font-bold">深山</div></button>
                     </div>
+                    <!-- 鎖定遮罩 -->
                     <div id="lock-site" class="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center z-10 hidden cursor-not-allowed"><span class="text-xs font-bold text-slate-400 bg-white px-2 py-1 rounded border shadow-sm">🔒 僅分析師可操作</span></div>
                 </div>
 
@@ -250,7 +254,7 @@
             return hashHex === ADMIN_HASH;
         }
 
-        // Login UI Logic
+        // Login Logic
         window.selectRole = (role) => {
             window.userState.role = role;
             document.querySelectorAll('.role-btn').forEach(btn => {
@@ -262,28 +266,27 @@
             checkLoginInput();
         };
 
-        // 即時檢查輸入框 (如果是老師，會自動顯示按鈕，但不提示身分)
+        // 即時檢查輸入框：按下按鈕前就給反饋 (但保持低調)
         async function checkLoginInput() {
             const t = document.getElementById('login-team').value.trim();
             const btn = document.getElementById('start-btn');
             
             if (!t) {
                 btn.disabled = true;
-                btn.classList.remove('bg-emerald-600', 'text-white');
-                btn.classList.add('bg-slate-700', 'text-slate-500');
+                btn.className = "w-full bg-slate-700 text-slate-500 py-4 rounded-xl font-bold mt-4 transition-all shadow-lg";
+                btn.innerText = "請輸入小組名稱";
                 return;
             }
 
-            // 檢查是否為老師代碼 (默默檢查，UI不變)
+            // 檢查是否為老師代碼 (默默檢查)
             const isAdmin = await checkPasscode(t);
             
             if (isAdmin) {
-                // 是老師 -> 開啟按鈕，但保留原樣，隱藏角色選單以防干擾
-                document.getElementById('role-selector').style.display = 'none';
+                // 是老師 -> 改變按鈕顏色 (藍色) 和文字提示
+                document.getElementById('role-selector').style.display = 'none'; // 老師不用選角色
                 btn.disabled = false;
-                btn.classList.remove('bg-slate-700', 'text-slate-500');
-                btn.classList.add('bg-emerald-600', 'text-white');
-                btn.innerText = "進入系統"; // 保持低調
+                btn.className = "w-full bg-blue-600 text-white py-4 rounded-xl font-bold mt-4 transition-all shadow-lg shadow-blue-600/20";
+                btn.innerText = "進入教師戰情室";
                 return;
             } else {
                 document.getElementById('role-selector').style.display = 'block';
@@ -292,11 +295,12 @@
             // 一般學生登入檢查 (需有名稱 + 角色)
             if(window.userState.role) {
                 btn.disabled = false;
-                btn.classList.remove('bg-slate-700', 'text-slate-500');
-                btn.classList.add('bg-emerald-600', 'text-white');
-                btn.innerText = "進入系統";
+                btn.className = "w-full bg-emerald-600 text-white py-4 rounded-xl font-bold mt-4 transition-all shadow-lg shadow-emerald-600/20";
+                btn.innerText = "進入戰情室";
             } else {
                 btn.disabled = true;
+                btn.className = "w-full bg-slate-700 text-slate-500 py-4 rounded-xl font-bold mt-4 transition-all shadow-lg";
+                btn.innerText = "請選擇角色";
             }
         }
         document.getElementById('login-team').addEventListener('input', checkLoginInput);
@@ -305,7 +309,7 @@
         window.enterSimulation = async () => {
             const teamInput = document.getElementById('login-team').value.trim();
             const btn = document.getElementById('start-btn');
-            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 連線中...`;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin inline mr-2"></i> 連線中...`;
             lucide.createIcons();
             
             try {
@@ -332,7 +336,7 @@
             } catch(e) { 
                 console.error(e); 
                 alert("Init Error: " + e.message); 
-                btn.innerHTML = "進入系統";
+                btn.innerHTML = "重試";
             }
         };
 
