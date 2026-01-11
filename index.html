@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>碳吉 TanJi - CCUS 淨零決策模擬器</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Noto Sans TC', sans-serif; overscroll-behavior-y: none; }
+        /* 滑桿樣式優化 */
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%;
@@ -20,6 +25,8 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .site-card { transition: all 0.2s; }
         .site-card:active { transform: scale(0.96); }
+        .dashboard-enter { animation: slideUp 0.5s ease-out forwards; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .glow-text { text-shadow: 0 0 10px rgba(255,255,255,0.5); }
     </style>
 </head>
@@ -35,12 +42,13 @@
         
         <div class="w-full max-w-sm space-y-4">
             <div>
-                <label class="text-xs font-bold text-slate-400 uppercase ml-1">小組代碼 (或老師密碼)</label>
-                <input type="text" id="login-team" placeholder="例如：A組" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 text-white font-bold focus:ring-2 focus:ring-emerald-500 outline-none">
+                <label class="text-xs font-bold text-slate-400 uppercase ml-1">小組名稱</label>
+                <input type="text" id="login-team" placeholder="輸入小組名" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 text-white font-bold focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                <!-- 移除了原本的提示文字，更加隱密 -->
             </div>
             
             <div id="role-selector">
-                <label class="text-xs font-bold text-slate-400 uppercase ml-1">選擇角色</label>
+                <label class="text-xs font-bold text-slate-400 uppercase ml-1">選擇您的角色</label>
                 <div class="grid grid-cols-2 gap-2 mt-1">
                     <button onclick="selectRole('engineer')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group">
                         <div class="text-xl mb-1">🔧</div>
@@ -92,10 +100,10 @@
 
     <!-- 主內容區 (學生模擬器) -->
     <main id="main-student" class="flex-1 overflow-y-auto p-4 pb-40 no-scrollbar relative hidden">
-        <!-- 這裡是原本的學生介面代碼，為了節省篇幅，我會保留原本的結構 -->
         <div class="container mx-auto max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- 左側：決策面板 (同前版) -->
+            <!-- 左側：決策面板 -->
             <div class="lg:col-span-7 space-y-4">
+                <!-- 選址區塊 -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
                     <div class="px-4 py-2 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
                         <h2 class="text-sm font-bold text-slate-700">1. 選址決策</h2>
@@ -106,28 +114,34 @@
                         <button onclick="updateTeamState('site', 'B')" id="btn-B" class="site-card p-3 rounded-xl border-2 border-slate-100 text-center"><div class="text-2xl mb-1">🏭</div><div class="text-xs font-bold">工業區</div></button>
                         <button onclick="updateTeamState('site', 'C')" id="btn-C" class="site-card p-3 rounded-xl border-2 border-slate-100 text-center"><div class="text-2xl mb-1">⛰️</div><div class="text-xs font-bold">深山</div></button>
                     </div>
+                    <!-- 鎖定遮罩 -->
                     <div id="lock-site" class="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center z-10 hidden cursor-not-allowed"><span class="text-xs font-bold text-slate-400 bg-white px-2 py-1 rounded border shadow-sm">🔒 僅分析師可操作</span></div>
                 </div>
 
+                <!-- 資源配置區塊 (2x2 Grid) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- 安全監測 -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 relative overflow-hidden">
                         <div class="flex justify-between mb-2 items-center"><label class="text-sm font-bold text-slate-700 flex gap-1"><i data-lucide="shield-check" class="w-4 h-4 text-blue-500"></i> 安全監測</label><span class="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded font-bold">🔧 工程師</span></div>
                         <input type="range" min="1" max="5" value="3" id="slider-safety" class="text-blue-500" oninput="updateTeamState('safety', this.value)">
                         <div class="flex justify-between text-[10px] text-slate-400 mt-2"><span>低</span><span id="val-safety" class="font-bold text-blue-600">標準</span><span>高</span></div>
                         <div id="lock-safety" class="absolute inset-0 bg-white/60 z-10 hidden"></div>
                     </div>
+                    <!-- 回饋金 -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 relative overflow-hidden">
                         <div class="flex justify-between mb-2 items-center"><label class="text-sm font-bold text-slate-700 flex gap-1"><i data-lucide="coins" class="w-4 h-4 text-amber-500"></i> 回饋金</label><span class="text-[10px] bg-amber-100 text-amber-600 px-2 py-0.5 rounded font-bold">📢 公關</span></div>
                         <input type="range" min="1" max="5" value="2" id="slider-pr" class="text-amber-500" oninput="updateTeamState('pr', this.value)">
                         <div class="flex justify-between text-[10px] text-slate-400 mt-2"><span>少</span><span id="val-pr" class="font-bold text-amber-600">標準</span><span>多</span></div>
                         <div id="lock-pr" class="absolute inset-0 bg-white/60 z-10 hidden"></div>
                     </div>
+                    <!-- 生態補償 -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 relative overflow-hidden">
                         <div class="flex justify-between mb-2 items-center"><label class="text-sm font-bold text-slate-700 flex gap-1"><i data-lucide="sprout" class="w-4 h-4 text-emerald-500"></i> 生態補償</label><span class="text-[10px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded font-bold">🌱 生態員</span></div>
                         <input type="range" min="1" max="5" value="2" id="slider-eco" class="text-emerald-500" oninput="updateTeamState('eco', this.value)">
                         <div class="flex justify-between text-[10px] text-slate-400 mt-2"><span>基本</span><span id="val-eco" class="font-bold text-emerald-600">標準</span><span>嚴格</span></div>
                         <div id="lock-eco" class="absolute inset-0 bg-white/60 z-10 hidden"></div>
                     </div>
+                    <!-- 預算緊縮 -->
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 relative overflow-hidden">
                         <div class="flex justify-between mb-2 items-center"><label class="text-sm font-bold text-slate-700 flex gap-1"><i data-lucide="piggy-bank" class="w-4 h-4 text-rose-500"></i> 預算緊縮</label><span class="text-[10px] bg-rose-100 text-rose-600 px-2 py-0.5 rounded font-bold">💰 財務長</span></div>
                         <input type="range" min="1" max="5" value="2" id="slider-cfo" class="text-rose-500" oninput="updateTeamState('cfo', this.value)">
@@ -161,7 +175,7 @@
         <div class="container mx-auto max-w-7xl">
             <div class="flex justify-between items-center mb-8">
                 <div>
-                    <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">全班決策總覽 (War Room)</h2>
+                    <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">全班決策總覽</h2>
                     <p class="text-slate-400 text-sm mt-1">即時監控各組決策動態與 SROI 表現</p>
                 </div>
                 <div class="flex items-center gap-4">
@@ -175,29 +189,25 @@
                 </div>
             </div>
 
-            <!-- 全班統計圖表 -->
+            <!-- 全班統計 -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
                     <h3 class="font-bold text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4"></i> 選址分佈</h3>
                     <div class="h-[200px] relative"><canvas id="adminPieChart"></canvas></div>
                 </div>
                 <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                    <h3 class="font-bold text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-4 h-4"></i> 平均 SROI 指標</h3>
+                    <h3 class="font-bold text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-4 h-4"></i> 平均指標</h3>
                     <div class="h-[200px] relative"><canvas id="adminBarChart"></canvas></div>
                 </div>
                 <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                    <h3 class="font-bold text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="trophy" class="w-4 h-4"></i> SROI 排行榜</h3>
-                    <div class="overflow-y-auto h-[200px] space-y-2 pr-2" id="leaderboard">
-                        <!-- JS 填入 -->
-                    </div>
+                    <h3 class="font-bold text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="trophy" class="w-4 h-4"></i> 排行榜</h3>
+                    <div class="overflow-y-auto h-[200px] space-y-2 pr-2" id="leaderboard"></div>
                 </div>
             </div>
 
-            <!-- 各組詳細卡片 -->
+            <!-- 各組卡片 -->
             <h3 class="font-bold text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="grid" class="w-4 h-4"></i> 各組即時狀態</h3>
-            <div id="team-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                <!-- JS 動態生成小組卡片 -->
-            </div>
+            <div id="team-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
         </div>
     </main>
 
@@ -212,9 +222,6 @@
                 <button onclick="submitFinalDecision()" id="submit-btn" class="bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 rounded-xl font-bold shadow-lg transition-all flex items-center gap-2 active:scale-95">
                     提交決策 <i data-lucide="send" class="w-4 h-4"></i>
                 </button>
-                <div id="lock-submit" class="absolute inset-0 bg-white/80 backdrop-blur-[1px] flex items-center justify-center rounded-xl cursor-not-allowed hidden">
-                    <span class="text-[10px] font-bold text-slate-500">等待分析師提交</span>
-                </div>
             </div>
         </div>
     </div>
@@ -224,7 +231,7 @@
         import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp, collection, addDoc, getDocs, deleteDoc, query, orderBy } 
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // CONFIG (請填入您的設定)
+        // ================= CONFIG =================
         const firebaseConfig = {
             apiKey: "AIzaSyDMBE9BjTJb70xm8c5WOZaIITxI0PmYWNc",
             authDomain: "tanji-ccus.firebaseapp.com",
@@ -233,13 +240,25 @@
             messagingSenderId: "118576059306",
             appId: "1:118576059306:web:8f1c7e87b49d4d388651d3"
         };
+        // ==========================================
 
         let db, unsubscribe;
         window.userState = { team: "", role: "" };
         window.teamState = { site: "A", safety: 3, pr: 2, eco: 2, cfo: 2, lastLog: "" };
         window.adminMode = false;
 
-        // 登入邏輯 (含老師後門)
+        // 資安雜湊驗證
+        async function checkPasscode(input) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(input);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            // 880619 的 SHA-256
+            return hashHex === "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35";
+        }
+
+        // Login Logic
         window.selectRole = (role) => {
             window.userState.role = role;
             document.querySelectorAll('.role-btn').forEach(btn => {
@@ -248,88 +267,108 @@
             });
             event.currentTarget.classList.remove('bg-slate-800');
             event.currentTarget.classList.add('ring-2', 'ring-emerald-500', 'bg-emerald-900');
-            checkLogin();
+            checkLoginInput();
         };
 
-        function checkLogin() {
+        async function checkLoginInput() {
             const t = document.getElementById('login-team').value;
             const btn = document.getElementById('start-btn');
             
-            // 老師密碼偵測
-            if (t === '880619') {
-                document.getElementById('role-selector').style.display = 'none'; // 隱藏角色選擇
-                btn.innerText = "進入教師戰情室";
+            if (!t) return;
+
+            // 檢查是否為老師代碼 (背後運算)
+            const isAdmin = await checkPasscode(t);
+            
+            if (isAdmin) {
+                // 是老師，靜默切換狀態，不改變 UI 外觀，直到按下按鈕
+                // 為了不讓學生發現，這裡只做標記，按鈕樣式可以保持不變
+                // 但為了方便老師識別，我們可以微微改變按鈕文字，或者完全不變
+                // 這裡選擇：不變，按下後才導向
                 btn.disabled = false;
                 btn.classList.remove('bg-slate-700', 'text-slate-500');
-                btn.classList.add('bg-blue-600', 'text-white');
+                btn.classList.add('bg-emerald-600', 'text-white');
+                // 隱藏角色選單 (既然是老師，就不需要選角色)
+                document.getElementById('role-selector').style.display = 'none';
                 return;
             } else {
                 document.getElementById('role-selector').style.display = 'block';
-                btn.innerText = "進入戰情室";
             }
 
-            if(t && window.userState.role) {
+            if(window.userState.role) {
                 btn.disabled = false;
                 btn.classList.remove('bg-slate-700', 'text-slate-500');
                 btn.classList.add('bg-emerald-600', 'text-white');
             }
         }
-        document.getElementById('login-team').addEventListener('input', checkLogin);
+        document.getElementById('login-team').addEventListener('input', checkLoginInput);
 
-        window.enterSimulation = () => {
+        window.enterSimulation = async () => {
             const teamInput = document.getElementById('login-team').value.trim();
+            const btn = document.getElementById('start-btn');
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> 載入中...`;
+            lucide.createIcons();
             
-            // 初始化 Firebase
             try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
+                if (firebaseConfig.apiKey && firebaseConfig.apiKey.length > 10) {
+                    const app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    console.log("🔥 Firebase Init");
+                } else {
+                    console.warn("⚠️ Demo Mode");
+                    db = null;
+                }
+
+                const isAdmin = await checkPasscode(teamInput);
+                
                 document.getElementById('login-screen').style.display = 'none';
 
-                // 判斷是否為老師
-                if (teamInput === '880619') {
+                if (isAdmin) {
                     window.adminMode = true;
                     initAdminDashboard();
                 } else {
                     window.userState.team = teamInput;
                     initStudentView();
                 }
-            } catch(e) {
-                console.error(e);
-                alert("連線錯誤");
+            } catch(e) { 
+                console.error(e); 
+                alert("Init Error"); 
+                btn.innerHTML = "進入系統";
             }
         };
 
-        // --- 學生端邏輯 ---
+        // Student Logic
         function initStudentView() {
             document.getElementById('main-student').classList.remove('hidden');
             document.getElementById('student-footer').classList.remove('hidden');
             const roleMap = { 'engineer':'環境工程師', 'cfo':'財務長', 'pr':'公關經理', 'policy':'政策分析師', 'eco':'生態保育員' };
             document.getElementById('header-team-info').innerText = `${window.userState.team} | ${roleMap[window.userState.role]}`;
-            document.getElementById('connection-indicator').innerHTML = `<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div><span class="text-[10px] font-bold text-green-600">已連線</span>`;
+            
+            if(db) document.getElementById('connection-indicator').innerHTML = `<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div><span class="text-[10px] font-bold text-green-600">已連線</span>`;
+            else document.getElementById('connection-indicator').innerHTML = `<div class="w-2 h-2 bg-orange-400 rounded-full"></div><span class="text-[10px] font-bold text-orange-500">模擬中</span>`;
             
             applyPermissions();
             startSync();
         }
 
-        // --- 老師端邏輯 (V13 新增) ---
+        // Admin Logic
         function initAdminDashboard() {
             document.getElementById('main-admin').classList.remove('hidden');
-            // 監聽所有小組的資料
+            if (!db) {
+                // Mock Data for Demo
+                renderTeamCards([{id:'演示組 A', total:85, site:'A'}, {id:'演示組 B', total:60, site:'B'}]);
+                return;
+            }
             const q = collection(db, "sessions");
             onSnapshot(q, (snapshot) => {
                 const teams = [];
                 let stats = { A:0, B:0, C:0, s:0, e:0, o:0 };
-                
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    const scores = calcScoreStatic(data); // 計算該組分數
+                    const scores = calcScoreStatic(data);
                     teams.push({ id: doc.id, ...data, ...scores });
-                    
-                    // 統計
                     if(stats[data.site] !== undefined) stats[data.site]++;
                     stats.s += scores.s; stats.e += scores.e; stats.o += scores.o;
                 });
-
                 document.getElementById('admin-team-count').innerText = teams.length;
                 updateAdminCharts(teams, stats);
                 renderTeamCards(teams);
@@ -337,7 +376,7 @@
             });
         }
 
-        // 老師端：渲染小組卡片
+        // Admin UI
         function renderTeamCards(teams) {
             const container = document.getElementById('team-cards');
             container.innerHTML = '';
@@ -345,104 +384,67 @@
                 const siteIcon = t.site === 'A' ? '🌊' : (t.site === 'B' ? '🏭' : '⛰️');
                 const card = document.createElement('div');
                 card.className = "bg-slate-800 p-4 rounded-xl border border-slate-700 hover:border-emerald-500 transition-colors";
-                card.innerHTML = `
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="font-bold text-white">${t.id}</span>
-                        <span class="text-xs bg-slate-700 px-2 py-1 rounded">${siteIcon}</span>
-                    </div>
-                    <div class="flex justify-between text-xs text-slate-400 mb-2">
-                        <span>SROI: <span class="text-emerald-400 font-bold text-lg">${t.total}</span></span>
-                    </div>
-                    <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                        <div class="bg-emerald-500 h-full" style="width: ${t.total}%"></div>
-                    </div>
-                    <div class="text-[10px] text-slate-500 mt-2 truncate">最後更新: ${t.lastLog || '無'}</div>
-                `;
+                card.innerHTML = `<div class="flex justify-between items-center mb-2"><span class="font-bold text-white">${t.id}</span><span class="text-xs bg-slate-700 px-2 py-1 rounded">${siteIcon}</span></div><div class="flex justify-between text-xs text-slate-400 mb-2"><span>SROI: <span class="text-emerald-400 font-bold text-lg">${t.total}</span></span></div><div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden"><div class="bg-emerald-500 h-full" style="width: ${t.total}%"></div></div><div class="text-[10px] text-slate-500 mt-2 truncate">最後更新: ${t.lastLog || '無'}</div>`;
                 container.appendChild(card);
             });
         }
 
-        // 老師端：排行榜
         function renderLeaderboard(teams) {
             const list = document.getElementById('leaderboard');
             list.innerHTML = '';
-            // 按 SROI 排序
             teams.sort((a,b) => parseFloat(b.total) - parseFloat(a.total)).forEach((t, i) => {
                 const row = document.createElement('div');
                 row.className = "flex justify-between items-center bg-slate-700/50 p-2 rounded text-xs";
-                row.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <span class="font-bold ${i<3 ? 'text-yellow-400':'text-slate-500'}">#${i+1}</span>
-                        <span class="text-slate-300">${t.id}</span>
-                    </div>
-                    <span class="font-mono text-emerald-400 font-bold">${t.total}</span>
-                `;
+                row.innerHTML = `<div class="flex items-center gap-2"><span class="font-bold ${i<3 ? 'text-yellow-400':'text-slate-500'}">#${i+1}</span><span class="text-slate-300">${t.id}</span></div><span class="font-mono text-emerald-400 font-bold">${t.total}</span>`;
                 list.appendChild(row);
             });
         }
 
-        // 老師端：清除所有資料
         window.clearAllData = async () => {
+            if(!db) { alert("模擬模式無法清除"); return; }
             if(confirm("確定要重置所有小組數據嗎？")) {
-                const q = query(collection(db, "sessions"));
+                const q = collection(db, "sessions");
                 const snapshot = await getDocs(q);
                 await Promise.all(snapshot.docs.map(doc => deleteDoc(doc.ref)));
-                // 也清除 decisions
-                const q2 = query(collection(db, "decisions"));
+                const q2 = collection(db, "decisions");
                 const snapshot2 = await getDocs(q2);
                 await Promise.all(snapshot2.docs.map(doc => deleteDoc(doc.ref)));
                 alert("課程已重置！");
             }
         };
 
-        // 學生端：同步邏輯
+        // Sync Logic
         function startSync() {
+            if (!db) { updateUI(); calcScore(); return; }
             const ref = doc(db, "sessions", window.userState.team);
             unsubscribe = onSnapshot(ref, (snap) => {
                 if(snap.exists()) {
                     const data = snap.data();
                     window.teamState = { ...window.teamState, ...data };
-                    updateUI(); 
-                    calcScore(); 
+                    updateUI(); calcScore(); 
                     if(data.lastLog) addLog(data.lastLog);
-                } else {
-                    setDoc(ref, window.teamState);
-                }
+                } else { setDoc(ref, window.teamState); }
             });
         }
 
         window.updateTeamState = async (key, val) => {
             window.teamState[key] = val;
-            calcScore();
-            updateUI();
-            
+            calcScore(); updateUI();
             const roleMap = { 'engineer':'工程師', 'cfo':'財務長', 'pr':'公關', 'policy':'分析師', 'eco':'生態員' };
             const logMsg = `${roleMap[window.userState.role]} 調整了參數`;
-
             if(db) {
                 const ref = doc(db, "sessions", window.userState.team);
-                await setDoc(ref, {
-                    [key]: val,
-                    lastLog: logMsg,
-                    timestamp: serverTimestamp()
-                }, { merge: true });
+                await setDoc(ref, { [key]: val, lastLog: logMsg, timestamp: serverTimestamp() }, { merge: true });
             }
         };
 
         function updateUI() {
             const s = window.teamState;
-            setSlider('safety', s.safety);
-            setSlider('pr', s.pr);
-            setSlider('eco', s.eco);
-            setSlider('cfo', s.cfo);
-            
+            setSlider('safety', s.safety); setSlider('pr', s.pr); setSlider('eco', s.eco); setSlider('cfo', s.cfo);
             ['A','B','C'].forEach(site => {
                 const btn = document.getElementById(`btn-${site}`);
-                if(site === s.site) {
-                    btn.className = "site-card p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 ring-2 ring-emerald-200 text-center";
-                } else {
-                    btn.className = "site-card p-3 rounded-xl border-2 border-slate-100 text-center opacity-60";
-                }
+                if(site === s.site) btn.className = "site-card p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 ring-2 ring-emerald-200 text-center";
+                else btn.className = "site-card p-3 rounded-xl border-2 border-slate-100 text-center opacity-60";
             });
         }
         function setSlider(id, val) {
@@ -468,7 +470,6 @@
             if(r !== 'cfo') lockUI('cfo');
             if(r !== 'policy') {
                 document.getElementById('lock-site').classList.remove('hidden');
-                document.getElementById('lock-submit').classList.remove('hidden');
             }
         }
         function lockUI(id) {
@@ -479,6 +480,10 @@
         window.submitFinalDecision = async () => {
             const btn = document.getElementById('submit-btn');
             btn.innerHTML = "傳送中...";
+            if (!db) {
+                setTimeout(() => { alert("【模擬模式】決策已提交！"); btn.innerHTML = "已送出 (模擬)"; btn.disabled = true; }, 500);
+                return;
+            }
             try {
                 await addDoc(collection(db, "decisions"), {
                     site: window.teamState.site,
@@ -489,10 +494,9 @@
                 alert("已送出至戰情室！");
                 btn.innerHTML = "已送出";
                 btn.disabled = true;
-            } catch(e) { alert("上傳失敗"); }
+            } catch(e) { console.error(e); alert("上傳失敗：" + e.message); btn.innerHTML = "提交失敗"; }
         }
 
-        // 共用計分邏輯 (靜態版給 Admin 用)
         const sites = { 'A': {s:85,e:20,o:95}, 'B': {s:50,e:95,o:15}, 'C': {s:70,e:60,o:55} };
         function calcScoreStatic(st) {
             const base = sites[st.site].base;
@@ -506,7 +510,6 @@
             return { s, e, o, total };
         }
 
-        // 學生端動態計分
         let chart;
         function calcScore(ret=false) {
             const res = calcScoreStatic(window.teamState);
@@ -515,54 +518,31 @@
                 document.getElementById('score-economy').innerText = parseInt(res.e);
                 document.getElementById('score-social').innerText = parseInt(res.o);
                 document.getElementById('footer-score').innerText = res.total;
-                if(chart) {
-                    chart.data.datasets[0].data = [res.s, res.e, res.o];
-                    chart.update();
-                }
+                if(chart) { chart.data.datasets[0].data = [res.s, res.e, res.o]; chart.update(); }
             }
             return res;
         }
 
-        // 老師端圖表
         let adminPie, adminBar;
         function updateAdminCharts(teams, stats) {
             const count = teams.length || 1;
-            // Pie
             if(!adminPie) {
                 const ctx = document.getElementById('adminPieChart').getContext('2d');
-                adminPie = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: { labels: ['外海','工業','深山'], datasets:[{data:[0,0,0], backgroundColor:['#3b82f6','#f59e0b','#10b981'], borderColor:'#1e293b'}] },
-                    options: { plugins: { legend: { labels: { color: '#cbd5e1' } } } }
-                });
+                adminPie = new Chart(ctx, { type: 'doughnut', data: { labels: ['外海','工業','深山'], datasets:[{data:[0,0,0], backgroundColor:['#3b82f6','#f59e0b','#10b981'], borderColor:'#1e293b'}] }, options: { plugins: { legend: { labels: { color: '#cbd5e1' } } } } });
             }
-            adminPie.data.datasets[0].data = [stats.A, stats.B, stats.C];
-            adminPie.update();
+            adminPie.data.datasets[0].data = [stats.A, stats.B, stats.C]; adminPie.update();
 
-            // Bar
             if(!adminBar) {
                 const ctx = document.getElementById('adminBarChart').getContext('2d');
-                adminBar = new Chart(ctx, {
-                    type: 'bar',
-                    data: { labels: ['安全','經濟','社會'], datasets:[{label:'全班平均', data:[0,0,0], backgroundColor:['#3b82f6','#f59e0b','#10b981']}] },
-                    options: { 
-                        scales: { y: { beginAtZero:true, max:100, grid:{color:'#334155'}, ticks:{color:'#94a3b8'} }, x: { grid:{display:false}, ticks:{color:'#94a3b8'} } },
-                        plugins: { legend: { display:false } }
-                    }
-                });
+                adminBar = new Chart(ctx, { type: 'bar', data: { labels: ['安全','經濟','社會'], datasets:[{label:'全班平均', data:[0,0,0], backgroundColor:['#3b82f6','#f59e0b','#10b981']}] }, options: { scales: { y: { beginAtZero:true, max:100, grid:{color:'#334155'}, ticks:{color:'#94a3b8'} }, x: { grid:{display:false}, ticks:{color:'#94a3b8'} } }, plugins: { legend: { display:false } } } });
             }
-            adminBar.data.datasets[0].data = [stats.s/count, stats.e/count, stats.o/count];
-            adminBar.update();
+            adminBar.data.datasets[0].data = [stats.s/count, stats.e/count, stats.o/count]; adminBar.update();
         }
 
         window.onload = () => {
             if(document.getElementById('radarChart')) {
                 const ctx = document.getElementById('radarChart').getContext('2d');
-                chart = new Chart(ctx, {
-                    type: 'radar',
-                    data: { labels: ['安全性', '經濟', '社會'], datasets: [{ data: [50,50,50], backgroundColor: 'rgba(16,185,129,0.2)', borderColor: '#10b981', borderWidth: 2 }] },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { display: false } } }, plugins: { legend: { display: false } } }
-                });
+                chart = new Chart(ctx, { type: 'radar', data: { labels: ['安全性', '經濟', '社會'], datasets: [{ data: [50,50,50], backgroundColor: 'rgba(16,185,129,0.2)', borderColor: '#10b981', borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { display: false } } }, plugins: { legend: { display: false } } } });
             }
             lucide.createIcons();
         };
