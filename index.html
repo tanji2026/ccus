@@ -248,12 +248,11 @@
         let db, auth, currentUser, unsubscribe;
         // 預設 appId
         const appId = typeof __app_id !== 'undefined' ? __app_id : "tanji-ccus-v1";
-        const ADMIN_HASH = "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"; // SHA-256 for 880619
 
         // 狀態管理
         window.userState = { team: "", role: "", isAdmin: false };
         window.teamState = { site: "A", safety: 3, pr: 2, eco: 2, cfo: 2, lastLog: "" };
-        let isDemoMode = false; // 新增：離線/體驗模式旗標
+        let isDemoMode = false; // 離線/體驗模式旗標
 
         // 初始化
         async function initApp() {
@@ -323,15 +322,6 @@
         
         initApp();
 
-        // 資安雜湊驗證
-        async function checkPasscode(input) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(input);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('') === ADMIN_HASH;
-        }
-
         // 角色選擇邏輯
         window.selectRole = (role) => {
             window.userState.role = role;
@@ -347,9 +337,10 @@
             checkLoginInput();
         };
 
-        // 即時檢查輸入框
-        window.checkLoginInput = async () => {
-            if (!currentUser && !isDemoMode) return; // 等待連線或Demo模式
+        // 即時檢查輸入框 (修正後：同步檢查，無須等待加密)
+        window.checkLoginInput = () => {
+            // 如果還沒連線且不是 Demo 模式，不執行
+            if (!currentUser && !isDemoMode) return; 
             
             const t = document.getElementById('login-team').value.trim();
             const btn = document.getElementById('start-btn');
@@ -361,8 +352,8 @@
                 return;
             }
 
-            // 檢查是否為老師代碼
-            const isAdmin = await checkPasscode(t);
+            // 直接檢查代碼，避免 Async 問題
+            const isAdmin = (t === '880619');
             
             if (isAdmin) {
                 window.userState.isAdmin = true;
