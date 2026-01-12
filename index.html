@@ -337,10 +337,10 @@
             checkLoginInput();
         };
 
-        // 即時檢查輸入框 (修正後：同步檢查，無須等待加密)
+        // 即時檢查輸入框 (修正後：移除對 Auth 狀態的依賴，允許直接輸入)
         window.checkLoginInput = () => {
-            // 如果還沒連線且不是 Demo 模式，不執行
-            if (!currentUser && !isDemoMode) return; 
+            // 修正：不再檢查 currentUser，允許尚未連線時也能觸發 UI 變更 (如顯示按鈕)
+            // if (!currentUser && !isDemoMode) return; 
             
             const t = document.getElementById('login-team').value.trim();
             const btn = document.getElementById('start-btn');
@@ -385,7 +385,21 @@
         // 進入模擬
         window.enterSimulation = async () => {
             const teamInput = document.getElementById('login-team').value.trim();
-            if (!currentUser) { alert("系統尚未就緒"); return; }
+            
+            // 修正：如果尚未連線，顯示載入中提示並嘗試強制進入 (依賴 Demo Mode 或等待連線)
+            if (!currentUser && !isDemoMode) { 
+                const btn = document.getElementById('start-btn');
+                const originalText = btn.innerHTML;
+                btn.innerText = "系統連線中...";
+                
+                // 等待 2 秒，如果還是沒連上，切換到 Demo Mode
+                await new Promise(r => setTimeout(r, 2000));
+                
+                if (!currentUser) {
+                    console.warn("Force enabling demo mode for entry");
+                    startDemoMode("Force Entry");
+                }
+            }
             
             document.getElementById('login-screen').style.opacity = '0';
             setTimeout(() => { document.getElementById('login-screen').style.display = 'none'; }, 500);
@@ -477,6 +491,7 @@
                 console.error("Admin sync error:", error);
                 // Admin 也可以降級到 Demo 模式顯示空數據或錯誤
                 alert("無法同步數據，切換至本機檢視模式");
+                // 這裡可以考慮自動切換到 Demo Mode 並重繪
             });
         }
 
