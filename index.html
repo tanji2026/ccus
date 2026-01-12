@@ -236,7 +236,6 @@
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // ================= CONFIG =================
-        // 修改：使用環境變數 __firebase_config 以確保在預覽環境正確連線
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyDMBE9BjTJb70xm8c5WOZaIITxI0PmYWNc",
             authDomain: "tanji-ccus.firebaseapp.com",
@@ -247,24 +246,33 @@
         };
         
         let db, auth, currentUser, unsubscribe;
-        // 修改：使用環境 app_id 變數，若無則使用預設值
+        // 預設 appId
         const appId = typeof __app_id !== 'undefined' ? __app_id : "tanji-ccus-v1";
         const ADMIN_HASH = "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"; // SHA-256 for 880619
 
         // 狀態管理
         window.userState = { team: "", role: "", isAdmin: false };
         window.teamState = { site: "A", safety: 3, pr: 2, eco: 2, cfo: 2, lastLog: "" };
+        let isDemoMode = false; // 新增：離線/體驗模式旗標
 
         // 初始化
         async function initApp() {
             try {
+                if (!firebaseConfig || !firebaseConfig.apiKey) {
+                    throw new Error("Missing Firebase Config");
+                }
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
                 
-                // 優先檢查是否有 token，否則匿名登入
+                // 優先檢查是否有 token
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
+                    try {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } catch (err) {
+                        console.warn("Custom token failed, trying anonymous");
+                        await signInAnonymously(auth);
+                    }
                 } else {
                     await signInAnonymously(auth);
                 }
@@ -272,18 +280,44 @@
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         currentUser = user;
-                        document.getElementById('connection-indicator').innerHTML = `<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div><span class="text-[10px] font-bold text-green-600">已連線</span>`;
-                        const startBtn = document.getElementById('start-btn');
-                        if (startBtn.disabled && startBtn.innerText === "系統載入中...") {
-                            startBtn.innerText = "請輸入小組名稱";
-                            // 重新觸發檢查以確保按鈕狀態正確
-                            checkLoginInput();
-                        }
+                        enableOnlineMode();
+                    } else {
+                        // 理論上不會發生，但以防萬一
+                        startDemoMode("Auth State Null");
                     }
                 });
             } catch (e) {
                 console.error("Firebase init failed:", e);
-                document.getElementById('start-btn').innerText = "連線失敗，請重整";
+                startDemoMode(e.message);
+            }
+        }
+        
+        function enableOnlineMode() {
+            isDemoMode = false;
+            document.getElementById('connection-indicator').innerHTML = `<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div><span class="text-[10px] font-bold text-green-600">已連線</span>`;
+            const startBtn = document.getElementById('start-btn');
+            // 如果還卡在「系統載入中...」或「連線失敗」，重置它
+            if (startBtn.innerText === "系統載入中..." || startBtn.innerText.includes("離線")) {
+                startBtn.disabled = true;
+                startBtn.className = "w-full bg-slate-700 text-slate-500 py-4 rounded-xl font-bold mt-4 transition-all shadow-lg";
+                startBtn.innerText = "請輸入小組名稱";
+                checkLoginInput(); // 重新檢查輸入狀態
+            }
+        }
+
+        function startDemoMode(reason) {
+            console.warn("Switching to DEMO MODE due to:", reason);
+            isDemoMode = true;
+            currentUser = { uid: 'demo-user', isAnonymous: true }; // Mock User
+            
+            document.getElementById('connection-indicator').innerHTML = `<div class="w-2 h-2 bg-amber-500 rounded-full"></div><span class="text-[10px] font-bold text-amber-600">體驗模式(離線)</span>`;
+            
+            const startBtn = document.getElementById('start-btn');
+            if (startBtn.innerText === "系統載入中..." || startBtn.innerText === "連線失敗，請重整") {
+                startBtn.disabled = true;
+                startBtn.className = "w-full bg-slate-700 text-slate-500 py-4 rounded-xl font-bold mt-4 transition-all shadow-lg";
+                startBtn.innerText = "請輸入小組名稱";
+                checkLoginInput();
             }
         }
         
@@ -315,7 +349,7 @@
 
         // 即時檢查輸入框
         window.checkLoginInput = async () => {
-            if (!auth || !currentUser) return; // 等待 Auth
+            if (!currentUser && !isDemoMode) return; // 等待連線或Demo模式
             
             const t = document.getElementById('login-team').value.trim();
             const btn = document.getElementById('start-btn');
@@ -360,7 +394,7 @@
         // 進入模擬
         window.enterSimulation = async () => {
             const teamInput = document.getElementById('login-team').value.trim();
-            if (!currentUser) { alert("尚未連線，請稍候"); return; }
+            if (!currentUser) { alert("系統尚未就緒"); return; }
             
             document.getElementById('login-screen').style.opacity = '0';
             setTimeout(() => { document.getElementById('login-screen').style.display = 'none'; }, 500);
@@ -411,6 +445,22 @@
         // --- 老師端邏輯 ---
         function initAdminDashboard() {
             document.getElementById('main-admin').classList.remove('hidden');
+            
+            if (isDemoMode) {
+                // 離線模式：產生模擬數據
+                const demoTeams = [
+                    { id: '第一組', site: 'A', safety: 3, pr: 2, eco: 2, cfo: 2, lastLog: '已連線', total: 78.5 },
+                    { id: '第二組', site: 'B', safety: 4, pr: 4, eco: 3, cfo: 2, lastLog: '調整參數中', total: 65.2 },
+                    { id: '第三組', site: 'C', safety: 2, pr: 1, eco: 5, cfo: 4, lastLog: '等待中', total: 82.1 }
+                ];
+                let stats = { A:1, B:1, C:1, s:250, e:200, o:210 }; // Mock stats
+                document.getElementById('admin-team-count').innerText = "3 (Demo)";
+                updateAdminCharts(demoTeams, stats);
+                renderTeamCards(demoTeams);
+                renderLeaderboard(demoTeams);
+                return;
+            }
+
             // 路徑修正: artifacts/{appId}/public/data/sessions
             const q = collection(db, 'artifacts', appId, 'public', 'data', 'sessions');
             
@@ -434,7 +484,8 @@
                 renderLeaderboard(teams);
             }, (error) => {
                 console.error("Admin sync error:", error);
-                alert("無法同步數據，請檢查控制台");
+                // Admin 也可以降級到 Demo 模式顯示空數據或錯誤
+                alert("無法同步數據，切換至本機檢視模式");
             });
         }
 
@@ -484,20 +535,30 @@
         }
 
         window.clearAllData = async () => {
+            if (isDemoMode) { alert("體驗模式無法刪除數據"); return; }
             if (!currentUser) return;
             if (confirm("⚠️ 警告：這將會刪除所有小組的進度！確定要重置嗎？")) {
-                const q = collection(db, 'artifacts', appId, 'public', 'data', 'sessions');
-                const snapshot = await getDocs(q);
-                const batch = [];
-                snapshot.docs.forEach(doc => {
-                    deleteDoc(doc.ref);
-                });
-                alert("課程已重置！");
+                try {
+                    const q = collection(db, 'artifacts', appId, 'public', 'data', 'sessions');
+                    const snapshot = await getDocs(q);
+                    const batch = [];
+                    snapshot.docs.forEach(doc => {
+                        deleteDoc(doc.ref);
+                    });
+                    alert("課程已重置！");
+                } catch(e) {
+                    alert("重置失敗：" + e.message);
+                }
             }
         };
 
         // --- 同步邏輯 (Sync Logic) ---
         function startSync() {
+            if (isDemoMode) {
+                // 離線模式：只更新 UI，不連線
+                addLog("體驗模式：資料僅儲存於本地");
+                return;
+            }
             if (!currentUser) return;
             // 使用正確的巢狀路徑
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sessions', window.userState.team);
@@ -519,7 +580,8 @@
                 }
             }, (error) => {
                 console.error("Student sync error:", error);
-                addLog("連線異常，正在重試...");
+                addLog("連線中斷，切換至本地模式...");
+                startDemoMode(error.message); // 出錯時切換到 Demo
             });
         }
 
@@ -529,11 +591,17 @@
             calcScore();
             updateUI(); // 確保本地 UI 即時響應 (Optimistic UI)
 
-            if (!currentUser) return;
-
             const roleMap = { 'engineer':'工程師', 'cfo':'財務長', 'pr':'公關', 'policy':'分析師', 'eco':'生態員' };
             const logMsg = `${roleMap[window.userState.role]} 調整了參數`;
-            
+
+            if (isDemoMode) {
+                // 離線模式：只記錄 Log
+                addLog(logMsg);
+                return;
+            }
+
+            if (!currentUser) return;
+
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sessions', window.userState.team);
             
             try {
@@ -544,7 +612,8 @@
                 }, { merge: true });
             } catch (e) {
                 console.error("Update failed:", e);
-                addLog("上傳失敗，請檢查網路");
+                // 不跳 alert 干擾操作，只在 log 顯示
+                addLog("同步失敗 (離線中)");
             }
         };
 
@@ -591,6 +660,17 @@
             btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin mr-2"></i> 傳送中...`;
             lucide.createIcons();
             
+            if (isDemoMode) {
+                setTimeout(() => {
+                    alert("【體驗模式】決策已送出！(本地模擬)");
+                    btn.innerHTML = `已送出 <i data-lucide="check" class="w-4 h-4 ml-1"></i>`;
+                    btn.className = "bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 cursor-default";
+                    btn.disabled = true;
+                    lucide.createIcons();
+                }, 800);
+                return;
+            }
+
             if (!currentUser) return;
 
             try {
