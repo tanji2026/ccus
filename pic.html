@@ -69,22 +69,18 @@
         
         .box-primary { fill: #fff; stroke: #10b981; stroke-width: 2; }
         .box-secondary { fill: #fff; stroke: #3b82f6; stroke-width: 2; }
-        .box-accent { fill: #fff; stroke: #f59e0b; stroke-width: 2; }
         .box-dark { fill: #1e293b; stroke: #0f172a; stroke-width: 2; }
         
         .text-dark { fill: #334155; font-size: 13px; font-weight: bold; }
-        .text-light { fill: #fff; font-size: 13px; font-weight: bold; }
         .text-sub { fill: #64748b; font-size: 11px; }
 
         .arrow-line { stroke: #94a3b8; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
-        .dashed-line { stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 4,4; fill: none; }
+        .dashed-line { stroke: #10b981; stroke-width: 2; stroke-dasharray: 4,4; fill: none; animation: dash 2s linear infinite; }
         
         /* UI Mockup Styles */
-        .screen-frame { fill: #fff; stroke: #cbd5e1; stroke-width: 3; rx: 15; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
-        .screen-header { fill: #f1f5f9; }
-        .ui-btn { fill: #10b981; rx: 4; }
         .ui-card { fill: #fff; stroke: #e2e8f0; stroke-width: 1; rx: 6; }
         .ui-card-active { fill: #ecfdf5; stroke: #10b981; stroke-width: 2; rx: 6; }
+        .ui-card-locked { fill: #f1f5f9; stroke: #cbd5e1; stroke-width: 1; rx: 6; }
         
     </style>
 </head>
@@ -101,218 +97,271 @@
                 </marker>
             </defs>
 
-            <!-- Layer 1: Client Side -->
+            <!-- Layer 1: Presentation -->
             <g transform="translate(50, 50)">
-                <rect x="0" y="0" width="700" height="140" rx="10" class="layer-bg"/>
+                <rect x="0" y="0" width="700" height="160" rx="10" class="layer-bg"/>
                 <text x="20" y="30" class="layer-title">前端表現層 (Presentation Layer)</text>
 
                 <!-- Student Device -->
-                <g transform="translate(50, 50)">
-                    <rect x="0" y="0" width="200" height="70" rx="8" class="box-primary"/>
+                <g transform="translate(50, 60)">
+                    <rect x="0" y="0" width="200" height="80" rx="8" class="box-primary"/>
                     <text x="100" y="30" text-anchor="middle" class="text-dark">學生端 (Student)</text>
-                    <text x="100" y="50" text-anchor="middle" class="text-sub">Mobile Web / RWD</text>
+                    <text x="100" y="50" text-anchor="middle" class="text-sub">HTML5 / Tailwind CSS</text>
+                    <text x="100" y="65" text-anchor="middle" class="text-sub" fill="#10b981">Role-based UI</text>
                 </g>
 
                 <!-- Teacher Device -->
-                <g transform="translate(450, 50)">
-                    <rect x="0" y="0" width="200" height="70" rx="8" class="box-dark"/>
+                <g transform="translate(450, 60)">
+                    <rect x="0" y="0" width="200" height="80" rx="8" class="box-dark"/>
                     <text x="100" y="30" text-anchor="middle" fill="white" font-weight="bold" font-size="13">教師戰情室 (Admin)</text>
-                    <text x="100" y="50" text-anchor="middle" fill="#94a3b8" font-size="11">Dashboard / Projector</text>
+                    <text x="100" y="50" text-anchor="middle" fill="#94a3b8" font-size="11">Data Dashboard</text>
+                    <text x="100" y="65" text-anchor="middle" fill="#94a3b8" font-size="11">Live Monitor</text>
                 </g>
             </g>
 
-            <!-- Arrows Down -->
-            <line x1="150" y1="190" x2="150" y2="240" class="arrow-line" />
-            <line x1="550" y1="190" x2="550" y2="240" class="arrow-line" />
-            <line x1="150" y1="240" x2="550" y2="240" class="dashed-line" /> <!-- Sync logic -->
+            <!-- Arrows -->
+            <line x1="150" y1="210" x2="150" y2="260" class="arrow-line" />
+            <line x1="550" y1="210" x2="550" y2="260" class="arrow-line" />
+            <path d="M 150 140 Q 350 200 550 140" stroke="#10b981" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+            <text x="350" y="180" text-anchor="middle" fill="#10b981" font-size="12" font-weight="bold">WebSocket-like Sync</text>
 
-            <!-- Layer 2: Logic Side -->
-            <g transform="translate(50, 240)">
-                <rect x="0" y="0" width="700" height="160" rx="10" class="layer-bg" style="stroke: #3b82f6; background: #eff6ff;"/>
-                <text x="20" y="30" class="layer-title" style="fill: #2563eb;">核心運算層 (Core Logic Layer)</text>
+            <!-- Layer 2: Logic -->
+            <g transform="translate(50, 260)">
+                <rect x="0" y="0" width="700" height="140" rx="10" class="layer-bg" style="stroke: #3b82f6; background: #eff6ff;"/>
+                <text x="20" y="30" class="layer-title" style="fill: #2563eb;">核心運算層 (Logic Layer)</text>
 
-                <!-- SROI Engine -->
-                <g transform="translate(150, 60)">
-                    <rect x="0" y="0" width="180" height="80" rx="8" fill="white" stroke="#3b82f6" stroke-width="2"/>
+                <!-- Engines -->
+                <g transform="translate(40, 50)">
+                    <rect x="0" y="0" width="180" height="70" rx="8" fill="white" stroke="#3b82f6" stroke-width="2"/>
                     <text x="90" y="30" text-anchor="middle" class="text-dark">SROI 運算引擎</text>
                     <text x="90" y="50" text-anchor="middle" class="text-sub">加權計分 / 風險評估</text>
-                    <text x="90" y="65" text-anchor="middle" class="text-sub">JavaScript (ES6)</text>
                 </g>
 
-                <!-- Chart Engine -->
-                <g transform="translate(370, 60)">
-                    <rect x="0" y="0" width="180" height="80" rx="8" fill="white" stroke="#f59e0b" stroke-width="2"/>
-                    <text x="90" y="30" text-anchor="middle" class="text-dark">視覺化繪圖引擎</text>
-                    <text x="90" y="50" text-anchor="middle" class="text-sub">Chart.js Library</text>
-                    <text x="90" y="65" text-anchor="middle" class="text-sub">即時動態渲染</text>
+                <g transform="translate(260, 50)">
+                    <rect x="0" y="0" width="180" height="70" rx="8" fill="white" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="90" y="30" text-anchor="middle" class="text-dark">權限鎖定控制器</text>
+                    <text x="90" y="50" text-anchor="middle" class="text-sub">角色功能開關 (Locking)</text>
+                </g>
+
+                <g transform="translate(480, 50)">
+                    <rect x="0" y="0" width="180" height="70" rx="8" fill="white" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="90" y="30" text-anchor="middle" class="text-dark">雜湊驗證模組</text>
+                    <text x="90" y="50" text-anchor="middle" class="text-sub">SHA-256 (Admin Auth)</text>
                 </g>
             </g>
 
-            <!-- Arrows Down -->
+            <!-- Arrows -->
             <line x1="350" y1="400" x2="350" y2="450" class="arrow-line" />
 
-            <!-- Layer 3: Data Side -->
+            <!-- Layer 3: Data -->
             <g transform="translate(50, 450)">
                 <rect x="0" y="0" width="700" height="100" rx="10" class="layer-bg" style="stroke: #f59e0b; background: #fffbeb;"/>
-                <text x="20" y="30" class="layer-title" style="fill: #d97706;">雲端資料層 (Cloud Data Layer)</text>
+                <text x="20" y="30" class="layer-title" style="fill: #d97706;">雲端資料層 (Data Layer)</text>
 
                 <g transform="translate(200, 40)">
                     <path d="M 0 20 Q 0 0 20 0 L 280 0 Q 300 0 300 20 L 300 40 Q 300 60 280 60 L 20 60 Q 0 60 0 40 Z" fill="#fff" stroke="#f59e0b" stroke-width="2"/>
                     <circle cx="40" cy="30" r="15" fill="#f59e0b"/>
                     <text x="40" y="35" text-anchor="middle" fill="white" font-weight="bold">🔥</text>
-                    <text x="170" y="35" text-anchor="middle" class="text-dark" font-size="16">Google Firebase (Firestore)</text>
+                    <text x="170" y="25" text-anchor="middle" class="text-dark" font-size="16">Google Firebase</text>
+                    <text x="170" y="45" text-anchor="middle" class="text-sub" font-size="12">Firestore (NoSQL Realtime DB)</text>
                 </g>
             </g>
         </svg>
-        <div class="caption">圖 1：採用 Modern Web App 架構，整合前端運算與雲端即時資料庫</div>
+        <div class="caption">圖 1：系統架構展示前端互動、邏輯運算與雲端資料庫的即時整合</div>
     </div>
 
     <!-- Sheet 2: User Flow -->
     <div class="paper-sheet">
-        <h1>圖二：教學互動流程圖 (Interactive Flow)</h1>
+        <h1>圖二：教學互動流程圖 (Teaching Workflow)</h1>
         
-        <svg viewBox="0 0 800 400">
+        <svg viewBox="0 0 800 450">
             <defs>
                 <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
                     <polygon points="0 0, 10 3.5, 0 7" fill="#10b981" />
                 </marker>
             </defs>
 
-            <!-- Step 1 -->
-            <g transform="translate(50, 150)">
-                <circle cx="30" cy="30" r="25" fill="#10b981"/>
-                <text x="30" y="38" text-anchor="middle" fill="white" font-weight="bold" font-size="18">1</text>
-                <rect x="70" y="0" width="140" height="60" rx="5" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
-                <text x="140" y="25" text-anchor="middle" class="text-dark">掃描登入</text>
-                <text x="140" y="45" text-anchor="middle" class="text-sub">輸入小組/角色名</text>
+            <!-- Role Section -->
+            <g transform="translate(50, 50)">
+                <rect x="0" y="0" width="700" height="80" rx="10" fill="#f0fdf4" stroke="#10b981"/>
+                <text x="350" y="25" text-anchor="middle" font-weight="bold" fill="#047857">5 大角色分權 (Role Assignment)</text>
+                
+                <g transform="translate(30, 40)">
+                    <circle cx="20" cy="20" r="15" fill="#3b82f6"/><text x="20" y="25" text-anchor="middle" fill="white" font-size="10">工</text>
+                    <text x="50" y="25" font-size="12">工程師</text>
+                </g>
+                <g transform="translate(160, 40)">
+                    <circle cx="20" cy="20" r="15" fill="#f59e0b"/><text x="20" y="25" text-anchor="middle" fill="white" font-size="10">財</text>
+                    <text x="50" y="25" font-size="12">財務長</text>
+                </g>
+                <g transform="translate(290, 40)">
+                    <circle cx="20" cy="20" r="15" fill="#10b981"/><text x="20" y="25" text-anchor="middle" fill="white" font-size="10">公</text>
+                    <text x="50" y="25" font-size="12">公關</text>
+                </g>
+                <g transform="translate(420, 40)">
+                    <circle cx="20" cy="20" r="15" fill="#8b5cf6"/><text x="20" y="25" text-anchor="middle" fill="white" font-size="10">政</text>
+                    <text x="50" y="25" font-size="12">分析師</text>
+                </g>
+                <g transform="translate(550, 40)">
+                    <circle cx="20" cy="20" r="15" fill="#ec4899"/><text x="20" y="25" text-anchor="middle" fill="white" font-size="10">生</text>
+                    <text x="50" y="25" font-size="12">生態員</text>
+                </g>
             </g>
 
-            <line x1="210" y1="180" x2="260" y2="180" stroke="#10b981" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+            <!-- Flow Steps -->
+            <g transform="translate(50, 180)">
+                <!-- Step 1 -->
+                <g>
+                    <circle cx="30" cy="30" r="25" fill="#1e293b"/>
+                    <text x="30" y="38" text-anchor="middle" fill="white" font-weight="bold" font-size="18">1</text>
+                    <rect x="70" y="0" width="130" height="60" rx="5" fill="#fff" stroke="#1e293b" stroke-width="2"/>
+                    <text x="135" y="25" text-anchor="middle" class="text-dark">小組登入</text>
+                    <text x="135" y="45" text-anchor="middle" class="text-sub">輸入相同組名</text>
+                </g>
 
-            <!-- Step 2 -->
-            <g transform="translate(260, 150)">
-                <circle cx="30" cy="30" r="25" fill="#10b981"/>
-                <text x="30" y="38" text-anchor="middle" fill="white" font-weight="bold" font-size="18">2</text>
-                <rect x="70" y="0" width="140" height="60" rx="5" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
-                <text x="140" y="25" text-anchor="middle" class="text-dark">模擬決策</text>
-                <text x="140" y="45" text-anchor="middle" class="text-sub">調整參數/觀察SROI</text>
+                <line x1="200" y1="30" x2="250" y2="30" stroke="#1e293b" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+
+                <!-- Step 2 -->
+                <g transform="translate(250, 0)">
+                    <circle cx="30" cy="30" r="25" fill="#1e293b"/>
+                    <text x="30" y="38" text-anchor="middle" fill="white" font-weight="bold" font-size="18">2</text>
+                    <rect x="70" y="0" width="130" height="60" rx="5" fill="#fff" stroke="#1e293b" stroke-width="2"/>
+                    <text x="135" y="25" text-anchor="middle" class="text-dark">分權操作</text>
+                    <text x="135" y="45" text-anchor="middle" class="text-sub">僅能操作職責項目</text>
+                </g>
+
+                <line x1="450" y1="30" x2="500" y2="30" stroke="#1e293b" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+
+                <!-- Step 3 -->
+                <g transform="translate(500, 0)">
+                    <circle cx="30" cy="30" r="25" fill="#1e293b"/>
+                    <text x="30" y="38" text-anchor="middle" fill="white" font-weight="bold" font-size="18">3</text>
+                    <rect x="70" y="0" width="130" height="60" rx="5" fill="#fff" stroke="#1e293b" stroke-width="2"/>
+                    <text x="135" y="25" text-anchor="middle" class="text-dark">即時同步</text>
+                    <text x="135" y="45" text-anchor="middle" class="text-sub">Team Sync 機制</text>
+                </g>
             </g>
 
-            <line x1="420" y1="180" x2="470" y2="180" stroke="#10b981" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+            <!-- Bottom Flow -->
+            <path d="M 700 210 Q 750 210 750 260 L 750 300 Q 750 350 700 350" stroke="#10b981" stroke-width="2" fill="none"/>
+            <line x1="700" y1="350" x2="600" y2="350" stroke="#10b981" stroke-width="2" marker-end="url(#arrowhead-green)"/>
 
-            <!-- Step 3 -->
-            <g transform="translate(470, 150)">
-                <circle cx="30" cy="30" r="25" fill="#3b82f6"/>
-                <text x="30" y="38" text-anchor="middle" fill="white" font-weight="bold" font-size="18">3</text>
-                <rect x="70" y="0" width="140" height="60" rx="5" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
-                <text x="140" y="25" text-anchor="middle" class="text-dark">雲端同步</text>
-                <text x="140" y="45" text-anchor="middle" class="text-sub">Firebase 即時上傳</text>
-            </g>
-
-            <path d="M 680 180 Q 730 180 730 230" stroke="#3b82f6" stroke-width="2" fill="none"/>
-            <path d="M 730 230 L 730 270" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowhead-green)" fill="none"/>
-
-            <!-- Step 4 (Bottom) -->
-            <g transform="translate(630, 280)">
-                <rect x="0" y="0" width="200" height="80" rx="10" fill="#1e293b"/>
-                <text x="100" y="35" text-anchor="middle" fill="#fff" font-weight="bold">戰情室儀表板</text>
-                <text x="100" y="55" text-anchor="middle" fill="#94a3b8" font-size="12">全班數據視覺化呈現</text>
+            <!-- Admin Area -->
+            <g transform="translate(200, 310)">
+                <rect x="0" y="0" width="380" height="80" rx="10" fill="#1e293b"/>
+                <text x="190" y="30" text-anchor="middle" fill="#fff" font-weight="bold" font-size="16">教師戰情室 (War Room)</text>
+                <g transform="translate(30, 45)">
+                    <circle cx="10" cy="10" r="5" fill="#22c55e"/>
+                    <text x="25" y="15" fill="#94a3b8" font-size="12">全班數據彙整</text>
+                </g>
+                <g transform="translate(150, 45)">
+                    <circle cx="10" cy="10" r="5" fill="#22c55e"/>
+                    <text x="25" y="15" fill="#94a3b8" font-size="12">SROI 排行榜</text>
+                </g>
+                <g transform="translate(270, 45)">
+                    <circle cx="10" cy="10" r="5" fill="#ef4444"/>
+                    <text x="25" y="15" fill="#94a3b8" font-size="12">一鍵重置課程</text>
+                </g>
             </g>
 
         </svg>
-        <div class="caption">圖 2：學生決策與教師監控的雙向互動流程</div>
+        <div class="caption">圖 2：基於 CSCL 理論設計的「角色分權」與「資料同步」流程</div>
     </div>
 
-    <!-- Sheet 3: Simulator UI (Mobile) -->
+    <!-- Sheet 3: Student UI -->
     <div class="paper-sheet">
-        <h1>圖三：教具介面 A - 學生端模擬器 (Mobile)</h1>
+        <h1>圖三：教具介面 A - 學生端 (分權協作模式)</h1>
         
         <svg viewBox="0 0 800 500">
-            <!-- Background Decoration -->
+            <!-- Background -->
             <circle cx="700" cy="100" r="100" fill="#ecfdf5" opacity="0.5"/>
             <circle cx="100" cy="400" r="80" fill="#eff6ff" opacity="0.5"/>
 
-            <!-- Phone Frame -->
+            <!-- Phone Frame (User: Engineer) -->
             <g transform="translate(250, 20)">
                 <rect x="0" y="0" width="300" height="460" rx="25" fill="#fff" stroke="#334155" stroke-width="8"/>
-                <!-- Notch -->
-                <path d="M 100 0 L 200 0 L 190 20 L 110 20 Z" fill="#334155"/>
+                <path d="M 100 0 L 200 0 L 190 20 L 110 20 Z" fill="#334155"/> <!-- Notch -->
                 
                 <!-- App Header -->
                 <rect x="10" y="30" width="280" height="40" fill="#fff"/>
                 <text x="30" y="55" font-weight="bold" fill="#10b981" font-size="16">碳吉 TanJi</text>
-                <circle cx="270" cy="50" r="4" fill="#22c55e"/> <!-- Online Status -->
+                <text x="200" y="55" font-size="10" fill="#3b82f6" font-weight="bold">我是：環境工程師</text>
 
                 <!-- Content Area -->
                 <g transform="translate(20, 80)">
-                    <!-- Step 1: Selection -->
-                    <text x="0" y="15" font-size="12" font-weight="bold" fill="#64748b">1. 選擇場址</text>
-                    <g transform="translate(0, 25)">
-                        <rect x="0" y="0" width="80" height="60" rx="5" class="ui-card-active"/>
-                        <text x="40" y="35" text-anchor="middle" font-size="20">🌊</text>
-                        <text x="40" y="50" text-anchor="middle" font-size="10" fill="#10b981">外海</text>
-
-                        <rect x="90" y="0" width="80" height="60" rx="5" class="ui-card"/>
-                        <text x="130" y="35" text-anchor="middle" font-size="20">🏭</text>
-                        <text x="130" y="50" text-anchor="middle" font-size="10" fill="#64748b">工業區</text>
-
-                        <rect x="180" y="0" width="80" height="60" rx="5" class="ui-card"/>
-                        <text x="220" y="35" text-anchor="middle" font-size="20">⛰️</text>
-                        <text x="220" y="50" text-anchor="middle" font-size="10" fill="#64748b">深山</text>
+                    <!-- Section 1: Locked Site Selection -->
+                    <rect x="0" y="0" width="260" height="80" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+                    <text x="10" y="20" font-size="12" font-weight="bold" fill="#94a3b8">1. 選址 (僅分析師可控)</text>
+                    <g transform="translate(10, 30)" opacity="0.5">
+                        <rect x="0" y="0" width="70" height="40" rx="5" fill="#fff" stroke="#cbd5e1"/>
+                        <text x="35" y="25" text-anchor="middle">外海</text>
+                        <rect x="80" y="0" width="70" height="40" rx="5" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+                        <text x="115" y="25" text-anchor="middle">工業</text>
+                        <rect x="160" y="0" width="70" height="40" rx="5" fill="#fff" stroke="#cbd5e1"/>
+                        <text x="195" y="25" text-anchor="middle">深山</text>
                     </g>
+                    <!-- Lock Icon -->
+                    <circle cx="240" cy="20" r="8" fill="#e2e8f0"/>
+                    <text x="240" y="24" text-anchor="middle" font-size="10">🔒</text>
 
-                    <!-- Step 2: Sliders -->
-                    <g transform="translate(0, 110)">
-                        <text x="0" y="0" font-size="12" font-weight="bold" fill="#64748b">2. 資源配置</text>
+                    <!-- Section 2: Active & Locked Controls -->
+                    <g transform="translate(0, 90)">
+                        <text x="0" y="15" font-size="12" font-weight="bold" fill="#64748b">2. 資源配置</text>
                         
-                        <text x="0" y="25" font-size="11" fill="#333">安全監測強度</text>
-                        <line x1="0" y1="35" x2="260" y2="35" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round"/>
-                        <circle cx="180" cy="35" r="8" fill="#3b82f6" stroke="#fff" stroke-width="2"/>
+                        <!-- My Control (Active) -->
+                        <g transform="translate(0, 25)">
+                            <text x="0" y="10" font-size="11" fill="#3b82f6" font-weight="bold">安全監測 (我負責)</text>
+                            <line x1="0" y1="25" x2="260" y2="25" stroke="#3b82f6" stroke-width="4" stroke-linecap="round"/>
+                            <circle cx="180" cy="25" r="10" fill="#fff" stroke="#3b82f6" stroke-width="3"/>
+                        </g>
 
-                        <text x="0" y="60" font-size="11" fill="#333">回饋金比例</text>
-                        <line x1="0" y1="70" x2="260" y2="70" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round"/>
-                        <circle cx="100" cy="70" r="8" fill="#f59e0b" stroke="#fff" stroke-width="2"/>
+                        <!-- Others Control (Locked) -->
+                        <g transform="translate(0, 60)" opacity="0.5">
+                            <text x="0" y="10" font-size="11" fill="#94a3b8">回饋金 (公關負責) 🔒</text>
+                            <line x1="0" y1="25" x2="260" y2="25" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round"/>
+                            <circle cx="100" cy="25" r="8" fill="#cbd5e1"/>
+                        </g>
                     </g>
 
-                    <!-- Step 3: Radar Chart Mockup -->
-                    <g transform="translate(30, 200)">
-                        <polygon points="100,20 180,80 150,160 50,160 20,80" fill="#ecfdf5" stroke="#10b981" stroke-width="1"/>
-                        <polygon points="100,40 160,85 140,140 60,140 40,85" fill="rgba(16, 185, 129, 0.4)" stroke="#059669" stroke-width="2"/>
-                        <text x="100" y="10" text-anchor="middle" font-size="10" fill="#64748b">安全性</text>
-                        <text x="190" y="80" text-anchor="middle" font-size="10" fill="#64748b">經濟</text>
-                        <text x="10" y="80" text-anchor="middle" font-size="10" fill="#64748b">社會</text>
-                        <text x="100" y="100" text-anchor="middle" font-weight="bold" font-size="14" fill="#059669">85分</text>
+                    <!-- Section 3: Live Data -->
+                    <g transform="translate(0, 190)">
+                        <text x="0" y="0" font-size="12" font-weight="bold" fill="#64748b">3. 即時 SROI</text>
+                        <!-- Radar -->
+                        <polygon points="130,20 180,80 160,130 100,130 80,80" fill="rgba(59, 130, 246, 0.2)" stroke="#3b82f6" stroke-width="2"/>
+                        <text x="130" y="80" text-anchor="middle" font-size="24" fill="#1e293b" font-weight="bold">82</text>
+                        <text x="130" y="95" text-anchor="middle" font-size="10" fill="#64748b">總分</text>
                     </g>
 
                     <!-- Footer Action -->
-                    <rect x="0" y="340" width="260" height="40" rx="20" fill="#1e293b"/>
-                    <text x="130" y="365" text-anchor="middle" fill="#fff" font-weight="bold" font-size="14">提交決策 ➜</text>
+                    <rect x="0" y="340" width="260" height="40" rx="20" fill="#f1f5f9" stroke="#cbd5e1" stroke-dasharray="4,4"/>
+                    <text x="130" y="365" text-anchor="middle" fill="#94a3b8" font-size="12">等待分析師提交...</text>
                 </g>
             </g>
 
-            <!-- Callout Lines -->
-            <line x1="150" y1="130" x2="250" y2="130" class="callout-line"/>
-            <circle cx="150" cy="130" r="3" class="callout-dot"/>
-            <rect x="60" y="115" width="90" height="30" rx="4" class="callout-box"/>
-            <text x="105" y="135" text-anchor="middle" class="callout-text">圖像化選址</text>
+            <!-- Annotations -->
+            <rect x="600" y="150" width="150" height="60" rx="5" class="callout-box"/>
+            <text x="610" y="170" class="callout-text">權限鎖定 (Locked)</text>
+            <text x="610" y="190" class="text-sub">非負責項目無法操作</text>
+            <line x1="600" y1="180" x2="520" y2="180" class="callout-line"/>
 
-            <line x1="650" y1="300" x2="550" y2="300" class="callout-line"/>
-            <circle cx="650" cy="300" r="3" class="callout-dot"/>
-            <rect x="650" y="285" width="100" height="30" rx="4" class="callout-box"/>
-            <text x="700" y="305" text-anchor="middle" class="callout-text">即時 SROI 雷達圖</text>
+            <rect x="50" y="200" width="150" height="60" rx="5" class="callout-box"/>
+            <text x="60" y="220" class="callout-text" style="fill:#3b82f6">專屬控制 (Active)</text>
+            <text x="60" y="240" class="text-sub">僅工程師可調整安全</text>
+            <line x1="200" y1="230" x2="250" y2="230" class="callout-line"/>
+
         </svg>
-        <div class="caption">圖 3：手機版介面採用直觀的滑桿與圖像設計，適合高中職學生操作</div>
+        <div class="caption">圖 3：學生端畫面（以環境工程師為例），展示「只能操作自己職責」的介面設計</div>
     </div>
 
-    <!-- Sheet 4: War Room UI (Desktop) -->
+    <!-- Sheet 4: Teacher UI -->
     <div class="paper-sheet">
-        <h1>圖四：教具介面 B - 教師端戰情室 (War Room)</h1>
+        <h1>圖四：教具介面 B - 教師戰情室 (Admin)</h1>
         
         <svg viewBox="0 0 800 500">
             <!-- Screen Frame -->
-            <rect x="50" y="50" width="700" height="450" rx="5" fill="#f8fafc" stroke="#333" stroke-width="2"/>
+            <rect x="50" y="50" width="700" height="450" rx="5" fill="#0f172a" stroke="#333" stroke-width="2"/>
             <!-- Browser Header -->
-            <rect x="50" y="50" width="700" height="30" rx="5" fill="#e2e8f0" stroke="#333" stroke-width="1"/>
+            <rect x="50" y="50" width="700" height="30" rx="5" fill="#1e293b" stroke="#333" stroke-width="1"/>
             <circle cx="70" cy="65" r="4" fill="#ef4444"/>
             <circle cx="85" cy="65" r="4" fill="#f59e0b"/>
             <circle cx="100" cy="65" r="4" fill="#22c55e"/>
@@ -320,69 +369,66 @@
             <!-- Dashboard Content -->
             <g transform="translate(70, 100)">
                 <!-- Header -->
-                <text x="0" y="20" font-size="24" font-weight="900" fill="#1e293b">全班決策戰情室</text>
-                <rect x="200" y="5" width="60" height="20" rx="10" fill="#ef4444"/>
-                <text x="230" y="19" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">LIVE</text>
+                <text x="0" y="20" font-size="24" font-weight="900" fill="#fff">全班決策總覽 (War Room)</text>
+                <text x="0" y="40" font-size="12" fill="#94a3b8">隱形入口：880619 | Status: Online</text>
 
-                <!-- Admin Button (Hidden) -->
-                <circle cx="650" cy="15" r="10" fill="#e2e8f0"/>
-                <path d="M 646 12 L 654 12 L 654 18 L 646 18 Z" fill="#94a3b8"/> <!-- Trash icon simple -->
+                <!-- Reset Button -->
+                <rect x="550" y="5" width="100" height="30" rx="5" fill="#b91c1c" stroke="#ef4444"/>
+                <text x="600" y="25" text-anchor="middle" fill="#fff" font-size="12">⚠ 重置課程</text>
 
-                <!-- Panels Grid -->
-                <g transform="translate(0, 50)">
-                    <!-- Panel 1: Site Distribution (Pie) -->
-                    <rect x="0" y="0" width="200" height="220" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="2"/>
-                    <text x="100" y="30" text-anchor="middle" font-weight="bold" fill="#64748b" font-size="14">選址分佈</text>
-                    <!-- Pie Chart -->
-                    <circle cx="100" cy="110" r="60" fill="#3b82f6" stroke="#fff" stroke-width="2" stroke-dasharray="100 200"/> <!-- Fake Pie -->
-                    <circle cx="100" cy="110" r="40" fill="#fff"/> <!-- Donut -->
-                    <path d="M 100 110 L 100 50 A 60 60 0 0 1 150 140 Z" fill="#f59e0b" opacity="0.8"/>
-                    <path d="M 100 110 L 150 140 A 60 60 0 0 1 60 150 Z" fill="#10b981" opacity="0.8"/>
+                <!-- Grid -->
+                <g transform="translate(0, 60)">
                     
-                    <rect x="20" y="190" width="10" height="10" fill="#3b82f6"/><text x="40" y="200" font-size="10">外海</text>
-                    <rect x="80" y="190" width="10" height="10" fill="#f59e0b"/><text x="100" y="200" font-size="10">工業</text>
-                    <rect x="140" y="190" width="10" height="10" fill="#10b981"/><text x="160" y="200" font-size="10">深山</text>
+                    <!-- Card 1: Charts -->
+                    <rect x="0" y="0" width="200" height="250" rx="10" fill="#1e293b" stroke="#334155"/>
+                    <text x="20" y="30" font-weight="bold" fill="#fff" font-size="14">全班選址分佈</text>
+                    <!-- Donut Chart -->
+                    <circle cx="100" cy="100" r="50" fill="none" stroke="#3b82f6" stroke-width="20" stroke-dasharray="180 360"/>
+                    <circle cx="100" cy="100" r="50" fill="none" stroke="#10b981" stroke-width="20" stroke-dasharray="90 360" stroke-dashoffset="-180"/>
+                    <circle cx="100" cy="100" r="50" fill="none" stroke="#f59e0b" stroke-width="20" stroke-dasharray="90 360" stroke-dashoffset="-270"/>
+                    <text x="100" y="190" text-anchor="middle" fill="#fff" font-size="12">外海(藍) / 深山(綠) / 工業(黃)</text>
 
-                    <!-- Panel 2: SROI Average (Bar) -->
-                    <rect x="220" y="0" width="200" height="220" rx="10" fill="#fff" stroke="#e2e8f0" stroke-width="2"/>
-                    <text x="100" y="30" text-anchor="middle" transform="translate(220,0)" font-weight="bold" fill="#64748b" font-size="14">平均 SROI 指標</text>
-                    <!-- Bar Chart -->
-                    <g transform="translate(240, 180) scale(1, -1)">
-                        <rect x="10" y="0" width="30" height="120" fill="#3b82f6" opacity="0.8"/>
-                        <rect x="60" y="0" width="30" height="80" fill="#f59e0b" opacity="0.8"/>
-                        <rect x="110" y="0" width="30" height="50" fill="#ef4444" opacity="0.8"/> <!-- Low Social -->
+                    <!-- Card 2: Leaderboard -->
+                    <rect x="220" y="0" width="200" height="250" rx="10" fill="#1e293b" stroke="#334155"/>
+                    <text x="240" y="30" font-weight="bold" fill="#fff" font-size="14">SROI 排行榜</text>
+                    
+                    <g transform="translate(230, 50)">
+                        <rect x="0" y="0" width="180" height="30" rx="5" fill="#334155"/>
+                        <text x="10" y="20" fill="#fbbf24" font-weight="bold">#1</text>
+                        <text x="40" y="20" fill="#fff">第 3 組</text>
+                        <text x="140" y="20" fill="#10b981" font-weight="bold">92.5</text>
+
+                        <rect x="0" y="40" width="180" height="30" rx="5" fill="#334155"/>
+                        <text x="10" y="60" fill="#cbd5e1" font-weight="bold">#2</text>
+                        <text x="40" y="60" fill="#fff">第 1 組</text>
+                        <text x="140" y="60" fill="#10b981" font-weight="bold">88.0</text>
+
+                        <rect x="0" y="80" width="180" height="30" rx="5" fill="#334155"/>
+                        <text x="10" y="100" fill="#b45309" font-weight="bold">#3</text>
+                        <text x="40" y="100" fill="#fff">第 5 組</text>
+                        <text x="140" y="100" fill="#10b981" font-weight="bold">85.3</text>
                     </g>
-                    <text x="255" y="200" font-size="10" fill="#64748b">安全</text>
-                    <text x="305" y="200" font-size="10" fill="#64748b">經濟</text>
-                    <text x="355" y="200" font-size="10" fill="#ef4444" font-weight="bold">社會⚠</text>
 
-                    <!-- Panel 3: Live Log -->
-                    <rect x="440" y="0" width="220" height="350" rx="10" fill="#1e293b"/>
-                    <text x="110" y="30" text-anchor="middle" transform="translate(440,0)" font-weight="bold" fill="#fff" font-size="14">最新決策動態</text>
-                    
-                    <g transform="translate(455, 50)">
-                        <!-- Log Item 1 -->
-                        <rect x="0" y="0" width="190" height="40" rx="5" fill="#334155"/>
-                        <circle cx="20" cy="20" r="5" fill="#22c55e"/>
-                        <text x="40" y="25" fill="#fff" font-size="12">第 3 組 - 淨零小隊</text>
-                        <text x="150" y="25" fill="#3b82f6" font-size="12" font-weight="bold">外海</text>
+                    <!-- Card 3: Live Teams -->
+                    <rect x="440" y="0" width="220" height="250" rx="10" fill="#1e293b" stroke="#334155"/>
+                    <text x="460" y="30" font-weight="bold" fill="#fff" font-size="14">即時小組狀態</text>
+                    <g transform="translate(450, 50)">
+                        <rect x="0" y="0" width="95" height="60" rx="5" fill="#064e3b" stroke="#059669"/>
+                        <text x="10" y="20" fill="#fff" font-size="12">第 1 組</text>
+                        <text x="10" y="40" fill="#34d399" font-size="10">● 已提交</text>
 
-                        <!-- Log Item 2 -->
-                        <rect x="0" y="50" width="190" height="40" rx="5" fill="#334155" opacity="0.8"/>
-                        <circle cx="20" cy="70" r="5" fill="#22c55e"/>
-                        <text x="40" y="75" fill="#fff" font-size="12">第 5 組 - 永續俠</text>
-                        <text x="150" y="75" fill="#f59e0b" font-size="12" font-weight="bold">工業</text>
+                        <rect x="105" y="0" width="95" height="60" rx="5" fill="#334155" stroke="#475569"/>
+                        <text x="115" y="20" fill="#fff" font-size="12">第 2 組</text>
+                        <text x="115" y="40" fill="#94a3b8" font-size="10">...討論中</text>
 
-                        <!-- Log Item 3 -->
-                        <rect x="0" y="100" width="190" height="40" rx="5" fill="#334155" opacity="0.6"/>
-                        <circle cx="20" cy="120" r="5" fill="#22c55e"/>
-                        <text x="40" y="125" fill="#fff" font-size="12">第 1 組</text>
-                        <text x="150" y="125" fill="#10b981" font-size="12" font-weight="bold">深山</text>
+                        <rect x="0" y="70" width="95" height="60" rx="5" fill="#064e3b" stroke="#059669"/>
+                        <text x="10" y="90" fill="#fff" font-size="12">第 3 組</text>
+                        <text x="10" y="110" fill="#34d399" font-size="10">● 已提交</text>
                     </g>
                 </g>
             </g>
         </svg>
-        <div class="caption">圖 4：教師端可即時監控全班決策傾向，並發現潛在問題（如社會接受度過低）</div>
+        <div class="caption">圖 4：教師端後台採用暗色系戰情室風格，突顯數據可視化效果</div>
     </div>
 
 </body>
