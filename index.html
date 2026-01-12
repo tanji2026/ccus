@@ -29,6 +29,10 @@
         .dashboard-enter { animation: slideUp 0.5s ease-out forwards; }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .glow-text { text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        
+        /* 鎖定狀態的滑桿 */
+        input[type=range]:disabled { opacity: 0.5; cursor: not-allowed; }
+        input[type=range]:disabled::-webkit-slider-thumb { border-color: #cbd5e1; background: #f1f5f9; box-shadow: none; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 h-[100dvh] flex flex-col overflow-hidden">
@@ -43,30 +47,30 @@
         
         <div class="w-full max-w-sm space-y-4">
             <div>
-                <label class="text-xs font-bold text-slate-400 uppercase ml-1">小組名稱 / 課程代碼</label>
-                <input type="text" id="login-team" placeholder="輸入小組名 (或代碼)" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 text-white font-bold focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                <label class="text-xs font-bold text-slate-400 uppercase ml-1">小組名稱 / 教師代碼</label>
+                <input type="text" id="login-team" placeholder="輸入小組名 (或 880619)" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 text-white font-bold focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
             </div>
             
-            <div id="role-selector">
+            <div id="role-selector" class="transition-all duration-300">
                 <label class="text-xs font-bold text-slate-400 uppercase ml-1">選擇您的角色</label>
                 <div class="grid grid-cols-2 gap-2 mt-1">
-                    <button onclick="selectRole('engineer')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group">
+                    <button onclick="selectRole('engineer')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group" data-role="engineer">
                         <div class="text-xl mb-1">🔧</div>
                         <div class="text-xs font-bold text-slate-300 group-hover:text-white">環境工程師</div>
                     </button>
-                    <button onclick="selectRole('cfo')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group">
+                    <button onclick="selectRole('cfo')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group" data-role="cfo">
                         <div class="text-xl mb-1">💰</div>
                         <div class="text-xs font-bold text-slate-300 group-hover:text-white">財務長</div>
                     </button>
-                    <button onclick="selectRole('pr')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group">
+                    <button onclick="selectRole('pr')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group" data-role="pr">
                         <div class="text-xl mb-1">📢</div>
                         <div class="text-xs font-bold text-slate-300 group-hover:text-white">公關經理</div>
                     </button>
-                    <button onclick="selectRole('eco')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group">
+                    <button onclick="selectRole('eco')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group" data-role="eco">
                         <div class="text-xl mb-1">🌱</div>
                         <div class="text-xs font-bold text-slate-300 group-hover:text-white">生態保育員</div>
                     </button>
-                    <button onclick="selectRole('policy')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group col-span-2">
+                    <button onclick="selectRole('policy')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group col-span-2" data-role="policy">
                         <div class="text-xl mb-1 flex items-center gap-2">📜 <span class="text-xs bg-emerald-900 text-emerald-400 px-1.5 rounded">隊長</span></div>
                         <div class="text-xs font-bold text-slate-300 group-hover:text-white">政策分析師</div>
                     </button>
@@ -74,7 +78,7 @@
             </div>
 
             <button id="start-btn" onclick="enterSimulation()" disabled class="w-full bg-slate-700 text-slate-500 py-4 rounded-xl font-bold mt-4 transition-all shadow-lg">
-                請輸入小組名稱
+                系統載入中...
             </button>
         </div>
     </div>
@@ -93,7 +97,7 @@
             </div>
             <div id="connection-indicator" class="flex items-center gap-1.5 px-2 py-1 bg-slate-100 rounded-full">
                 <div class="w-2 h-2 bg-slate-400 rounded-full"></div>
-                <span class="text-[10px] font-bold text-slate-500">離線</span>
+                <span class="text-[10px] font-bold text-slate-500">連線中...</span>
             </div>
         </div>
     </nav>
@@ -124,25 +128,25 @@
                         <div class="flex justify-between mb-2 items-center"><label class="text-sm font-bold text-slate-700 flex gap-1"><i data-lucide="shield-check" class="w-4 h-4 text-blue-500"></i> 安全監測</label><span class="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded font-bold">🔧 工程師</span></div>
                         <input type="range" min="1" max="5" value="3" id="slider-safety" class="text-blue-500" oninput="updateTeamState('safety', this.value)">
                         <div class="flex justify-between text-[10px] text-slate-400 mt-2"><span>低</span><span id="val-safety" class="font-bold text-blue-600">標準</span><span>高</span></div>
-                        <div id="lock-safety" class="absolute inset-0 bg-white/60 z-10 hidden"></div>
+                        <div id="lock-safety" class="absolute inset-0 bg-white/60 z-10 hidden flex items-center justify-center"><i data-lucide="lock" class="w-4 h-4 text-slate-400"></i></div>
                     </div>
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 relative overflow-hidden">
                         <div class="flex justify-between mb-2 items-center"><label class="text-sm font-bold text-slate-700 flex gap-1"><i data-lucide="coins" class="w-4 h-4 text-amber-500"></i> 回饋金</label><span class="text-[10px] bg-amber-100 text-amber-600 px-2 py-0.5 rounded font-bold">📢 公關</span></div>
                         <input type="range" min="1" max="5" value="2" id="slider-pr" class="text-amber-500" oninput="updateTeamState('pr', this.value)">
                         <div class="flex justify-between text-[10px] text-slate-400 mt-2"><span>少</span><span id="val-pr" class="font-bold text-amber-600">標準</span><span>多</span></div>
-                        <div id="lock-pr" class="absolute inset-0 bg-white/60 z-10 hidden"></div>
+                        <div id="lock-pr" class="absolute inset-0 bg-white/60 z-10 hidden flex items-center justify-center"><i data-lucide="lock" class="w-4 h-4 text-slate-400"></i></div>
                     </div>
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 relative overflow-hidden">
                         <div class="flex justify-between mb-2 items-center"><label class="text-sm font-bold text-slate-700 flex gap-1"><i data-lucide="sprout" class="w-4 h-4 text-emerald-500"></i> 生態補償</label><span class="text-[10px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded font-bold">🌱 生態員</span></div>
                         <input type="range" min="1" max="5" value="2" id="slider-eco" class="text-emerald-500" oninput="updateTeamState('eco', this.value)">
                         <div class="flex justify-between text-[10px] text-slate-400 mt-2"><span>基本</span><span id="val-eco" class="font-bold text-emerald-600">標準</span><span>嚴格</span></div>
-                        <div id="lock-eco" class="absolute inset-0 bg-white/60 z-10 hidden"></div>
+                        <div id="lock-eco" class="absolute inset-0 bg-white/60 z-10 hidden flex items-center justify-center"><i data-lucide="lock" class="w-4 h-4 text-slate-400"></i></div>
                     </div>
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 relative overflow-hidden">
                         <div class="flex justify-between mb-2 items-center"><label class="text-sm font-bold text-slate-700 flex gap-1"><i data-lucide="piggy-bank" class="w-4 h-4 text-rose-500"></i> 預算緊縮</label><span class="text-[10px] bg-rose-100 text-rose-600 px-2 py-0.5 rounded font-bold">💰 財務長</span></div>
                         <input type="range" min="1" max="5" value="2" id="slider-cfo" class="text-rose-500" oninput="updateTeamState('cfo', this.value)">
                         <div class="flex justify-between text-[10px] text-slate-400 mt-2"><span>寬鬆</span><span id="val-cfo" class="font-bold text-rose-600">標準</span><span>嚴格</span></div>
-                        <div id="lock-cfo" class="absolute inset-0 bg-white/60 z-10 hidden"></div>
+                        <div id="lock-cfo" class="absolute inset-0 bg-white/60 z-10 hidden flex items-center justify-center"><i data-lucide="lock" class="w-4 h-4 text-slate-400"></i></div>
                     </div>
                 </div>
             </div>
@@ -153,14 +157,16 @@
                     <div class="flex justify-between items-center mb-2"><h3 class="font-bold text-slate-800">SROI 預測模型</h3><span class="text-[10px] text-slate-400">Team Sync Active</span></div>
                     <div class="h-[200px] relative"><canvas id="radarChart"></canvas></div>
                     <div class="mt-3 space-y-1">
-                        <div class="flex justify-between text-xs border-b border-slate-50 pb-1"><span class="text-slate-500">安全性</span><span id="score-safety" class="font-bold text-blue-600">0</span></div>
-                        <div class="flex justify-between text-xs border-b border-slate-50 pb-1"><span class="text-slate-500">經濟性</span><span id="score-economy" class="font-bold text-amber-600">0</span></div>
-                        <div class="flex justify-between text-xs"><span class="text-slate-500">社會性</span><span id="score-social" class="font-bold text-emerald-600">0</span></div>
+                        <div class="flex justify-between text-xs border-b border-slate-50 pb-1"><span class="text-slate-500">安全性 (Safety)</span><span id="score-safety" class="font-bold text-blue-600">0</span></div>
+                        <div class="flex justify-between text-xs border-b border-slate-50 pb-1"><span class="text-slate-500">經濟性 (Economy)</span><span id="score-economy" class="font-bold text-amber-600">0</span></div>
+                        <div class="flex justify-between text-xs"><span class="text-slate-500">社會性 (Social)</span><span id="score-social" class="font-bold text-emerald-600">0</span></div>
                     </div>
                 </div>
                 <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
                     <h4 class="text-xs font-bold text-emerald-400 mb-2 flex items-center gap-1"><i data-lucide="terminal" class="w-3 h-3"></i> 即時協作紀錄</h4>
-                    <div id="system-log" class="text-xs text-slate-400 h-24 overflow-y-auto space-y-1 font-mono">等待連線...</div>
+                    <div id="system-log" class="text-xs text-slate-400 h-24 overflow-y-auto space-y-1 font-mono">
+                        <div>> 系統初始化完成...</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -222,53 +228,86 @@
         </div>
     </div>
 
+    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp, collection, addDoc, getDocs, deleteDoc, query, orderBy } 
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // ================= CONFIG =================
-        const firebaseConfig = {
-            apiKey: "AIzaSyDMBE9BjTJb70xm8c5WOZaIITxI0PmYWNc",
-            authDomain: "tanji-ccus.firebaseapp.com",
-            projectId: "tanji-ccus",
-            storageBucket: "tanji-ccus.firebasestorage.app",
-            messagingSenderId: "118576059306",
-            appId: "1:118576059306:web:8f1c7e87b49d4d388651d3"
-        };
-        // ==========================================
+        const firebaseConfig = JSON.parse('{"apiKey":"AIzaSyDMBE9BjTJb70xm8c5WOZaIITxI0PmYWNc","authDomain":"tanji-ccus.firebaseapp.com","projectId":"tanji-ccus","storageBucket":"tanji-ccus.firebasestorage.app","messagingSenderId":"118576059306","appId":"1:118576059306:web:8f1c7e87b49d4d388651d3"}');
+        
+        let db, auth, currentUser, unsubscribe;
+        const appId = "tanji-ccus-v1"; // 應用程式 ID，用於路徑隔離
+        const ADMIN_HASH = "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"; // SHA-256 for 880619
 
-        let db, unsubscribe;
-        window.userState = { team: "", role: "" };
+        // 狀態管理
+        window.userState = { team: "", role: "", isAdmin: false };
         window.teamState = { site: "A", safety: 3, pr: 2, eco: 2, cfo: 2, lastLog: "" };
-        window.adminMode = false;
 
-        // 資安雜湊驗證 (880619 的 SHA-256)
-        const ADMIN_HASH = "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35";
+        // 初始化
+        async function initApp() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                
+                // 優先檢查是否有 token，否則匿名登入
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
 
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        currentUser = user;
+                        document.getElementById('connection-indicator').innerHTML = `<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div><span class="text-[10px] font-bold text-green-600">已連線</span>`;
+                        const startBtn = document.getElementById('start-btn');
+                        if (startBtn.disabled && startBtn.innerText === "系統載入中...") {
+                            startBtn.innerText = "請輸入小組名稱";
+                            // 重新觸發檢查以確保按鈕狀態正確
+                            checkLoginInput();
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error("Firebase init failed:", e);
+                document.getElementById('start-btn').innerText = "連線失敗，請重整";
+            }
+        }
+        
+        initApp();
+
+        // 資安雜湊驗證
         async function checkPasscode(input) {
             const encoder = new TextEncoder();
             const data = encoder.encode(input);
             const hashBuffer = await crypto.subtle.digest('SHA-256', data);
             const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-            return hashHex === ADMIN_HASH;
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('') === ADMIN_HASH;
         }
 
-        // Login Logic
+        // 角色選擇邏輯
         window.selectRole = (role) => {
             window.userState.role = role;
             document.querySelectorAll('.role-btn').forEach(btn => {
-                btn.classList.remove('ring-2', 'ring-emerald-500', 'bg-emerald-50');
+                btn.classList.remove('ring-2', 'ring-emerald-500', 'bg-emerald-900', 'bg-emerald-50');
                 btn.classList.add('bg-slate-800');
             });
-            event.currentTarget.classList.remove('bg-slate-800');
-            event.currentTarget.classList.add('ring-2', 'ring-emerald-500', 'bg-emerald-900');
+            const selectedBtn = document.querySelector(`button[data-role="${role}"]`);
+            if (selectedBtn) {
+                selectedBtn.classList.remove('bg-slate-800');
+                selectedBtn.classList.add('ring-2', 'ring-emerald-500', 'bg-emerald-900');
+            }
             checkLoginInput();
         };
 
-        // 即時檢查輸入框：按下按鈕前就給反饋
-        async function checkLoginInput() {
+        // 即時檢查輸入框
+        window.checkLoginInput = async () => {
+            if (!auth || !currentUser) return; // 等待 Auth
+            
             const t = document.getElementById('login-team').value.trim();
             const btn = document.getElementById('start-btn');
             
@@ -279,65 +318,49 @@
                 return;
             }
 
-            // 檢查是否為老師代碼 (默默檢查)
+            // 檢查是否為老師代碼
             const isAdmin = await checkPasscode(t);
             
             if (isAdmin) {
-                // 是老師 -> 改變按鈕顏色 (綠色) 和文字提示
-                document.getElementById('role-selector').style.display = 'none'; // 老師不用選角色
+                window.userState.isAdmin = true;
+                document.getElementById('role-selector').style.display = 'none';
+                document.getElementById('role-selector').style.opacity = '0';
                 btn.disabled = false;
-                btn.className = "w-full bg-emerald-600 text-white py-4 rounded-xl font-bold mt-4 transition-all shadow-lg shadow-emerald-600/20";
-                btn.innerText = "進入戰情室";
-                return;
+                btn.className = "w-full bg-emerald-600 text-white py-4 rounded-xl font-bold mt-4 transition-all shadow-lg shadow-emerald-600/20 hover:bg-emerald-500";
+                btn.innerHTML = `進入戰情室 <i data-lucide="layout-dashboard" class="w-4 h-4 inline ml-1"></i>`;
+                lucide.createIcons();
             } else {
+                window.userState.isAdmin = false;
                 document.getElementById('role-selector').style.display = 'block';
+                document.getElementById('role-selector').style.opacity = '1';
+                
+                if (window.userState.role) {
+                    btn.disabled = false;
+                    btn.className = "w-full bg-emerald-600 text-white py-4 rounded-xl font-bold mt-4 transition-all shadow-lg shadow-emerald-600/20 hover:bg-emerald-500";
+                    btn.innerText = "開始模擬";
+                } else {
+                    btn.disabled = true;
+                    btn.className = "w-full bg-slate-700 text-slate-500 py-4 rounded-xl font-bold mt-4 transition-all shadow-lg";
+                    btn.innerText = "請選擇角色";
+                }
             }
-
-            // 一般學生登入檢查 (需有名稱 + 角色)
-            if(window.userState.role) {
-                btn.disabled = false;
-                btn.className = "w-full bg-emerald-600 text-white py-4 rounded-xl font-bold mt-4 transition-all shadow-lg shadow-emerald-600/20";
-                btn.innerText = "進入戰情室";
-            } else {
-                btn.disabled = true;
-                btn.className = "w-full bg-slate-700 text-slate-500 py-4 rounded-xl font-bold mt-4 transition-all shadow-lg";
-                btn.innerText = "請選擇角色";
-            }
-        }
+        };
+        
         document.getElementById('login-team').addEventListener('input', checkLoginInput);
 
-        // 按下按鈕後的路由分流
+        // 進入模擬
         window.enterSimulation = async () => {
             const teamInput = document.getElementById('login-team').value.trim();
-            const btn = document.getElementById('start-btn');
-            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin inline mr-2"></i> 連線中...`;
-            lucide.createIcons();
+            if (!currentUser) { alert("尚未連線，請稍候"); return; }
             
-            try {
-                if (firebaseConfig.apiKey && firebaseConfig.apiKey.length > 10) {
-                    const app = initializeApp(firebaseConfig);
-                    db = getFirestore(app);
-                    console.log("🔥 Firebase Init");
-                } else {
-                    console.warn("⚠️ Demo Mode");
-                    db = null;
-                }
+            document.getElementById('login-screen').style.opacity = '0';
+            setTimeout(() => { document.getElementById('login-screen').style.display = 'none'; }, 500);
 
-                const isAdmin = await checkPasscode(teamInput);
-                
-                document.getElementById('login-screen').style.display = 'none';
-
-                if (isAdmin) {
-                    window.adminMode = true;
-                    initAdminDashboard();
-                } else {
-                    window.userState.team = teamInput;
-                    initStudentView();
-                }
-            } catch(e) { 
-                console.error(e); 
-                alert("Init Error: " + e.message); 
-                btn.innerHTML = "重試";
+            if (window.userState.isAdmin) {
+                initAdminDashboard();
+            } else {
+                window.userState.team = teamInput;
+                initStudentView();
             }
         };
 
@@ -348,36 +371,61 @@
             const roleMap = { 'engineer':'環境工程師', 'cfo':'財務長', 'pr':'公關經理', 'policy':'政策分析師', 'eco':'生態保育員' };
             document.getElementById('header-team-info').innerText = `${window.userState.team} | ${roleMap[window.userState.role]}`;
             
-            if(db) document.getElementById('connection-indicator').innerHTML = `<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div><span class="text-[10px] font-bold text-green-600">已連線</span>`;
-            else document.getElementById('connection-indicator').innerHTML = `<div class="w-2 h-2 bg-orange-400 rounded-full"></div><span class="text-[10px] font-bold text-orange-500">模擬中</span>`;
-            
             applyPermissions();
             startSync();
+            // 初始計算一次
+            calcScore();
+        }
+
+        function applyPermissions() {
+            const r = window.userState.role;
+            if (r !== 'engineer') lockUI('safety');
+            if (r !== 'pr') lockUI('pr');
+            if (r !== 'eco') lockUI('eco');
+            if (r !== 'cfo') lockUI('cfo');
+            if (r !== 'policy') {
+                document.getElementById('lock-site').classList.remove('hidden');
+                document.getElementById('lock-site').classList.add('flex');
+            }
+        }
+
+        function lockUI(id) {
+            const slider = document.getElementById(`slider-${id}`);
+            if (slider) slider.disabled = true;
+            const lockOverlay = document.getElementById(`lock-${id}`);
+            if (lockOverlay) {
+                lockOverlay.classList.remove('hidden');
+                lockOverlay.classList.add('flex');
+            }
         }
 
         // --- 老師端邏輯 ---
         function initAdminDashboard() {
             document.getElementById('main-admin').classList.remove('hidden');
-            if (!db) {
-                // Mock Data for Demo
-                renderTeamCards([{id:'演示組 A', total:85, site:'A'}, {id:'演示組 B', total:60, site:'B'}]);
-                return;
-            }
-            const q = collection(db, "sessions");
+            // 路徑修正: artifacts/{appId}/public/data/sessions
+            const q = collection(db, 'artifacts', appId, 'public', 'data', 'sessions');
+            
             onSnapshot(q, (snapshot) => {
                 const teams = [];
                 let stats = { A:0, B:0, C:0, s:0, e:0, o:0 };
+                
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     const scores = calcScoreStatic(data);
+                    // doc.id 即為小組名稱
                     teams.push({ id: doc.id, ...data, ...scores });
+                    
                     if(stats[data.site] !== undefined) stats[data.site]++;
                     stats.s += scores.s; stats.e += scores.e; stats.o += scores.o;
                 });
+                
                 document.getElementById('admin-team-count').innerText = teams.length;
                 updateAdminCharts(teams, stats);
                 renderTeamCards(teams);
                 renderLeaderboard(teams);
+            }, (error) => {
+                console.error("Admin sync error:", error);
+                alert("無法同步數據，請檢查控制台");
             });
         }
 
@@ -388,8 +436,22 @@
             teams.forEach(t => {
                 const siteIcon = t.site === 'A' ? '🌊' : (t.site === 'B' ? '🏭' : '⛰️');
                 const card = document.createElement('div');
-                card.className = "bg-slate-800 p-4 rounded-xl border border-slate-700 hover:border-emerald-500 transition-colors";
-                card.innerHTML = `<div class="flex justify-between items-center mb-2"><span class="font-bold text-white">${t.id}</span><span class="text-xs bg-slate-700 px-2 py-1 rounded">${siteIcon}</span></div><div class="flex justify-between text-xs text-slate-400 mb-2"><span>SROI: <span class="text-emerald-400 font-bold text-lg">${t.total}</span></span></div><div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden"><div class="bg-emerald-500 h-full" style="width: ${t.total}%"></div></div><div class="text-[10px] text-slate-500 mt-2 truncate">最後更新: ${t.lastLog || '無'}</div>`;
+                card.className = "bg-slate-800 p-4 rounded-xl border border-slate-700 hover:border-emerald-500 transition-colors cursor-default";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-white truncate max-w-[120px]">${t.id}</span>
+                        <span class="text-xs bg-slate-700 px-2 py-1 rounded">${siteIcon}</span>
+                    </div>
+                    <div class="flex justify-between text-xs text-slate-400 mb-2">
+                        <span>SROI: <span class="text-emerald-400 font-bold text-lg">${t.total}</span></span>
+                    </div>
+                    <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                        <div class="bg-emerald-500 h-full" style="width: ${Math.min(100, t.total)}%"></div>
+                    </div>
+                    <div class="text-[10px] text-slate-500 mt-2 truncate">
+                        ${t.lastLog || '等待操作...'}
+                    </div>
+                `;
                 container.appendChild(card);
             });
         }
@@ -397,120 +459,173 @@
         function renderLeaderboard(teams) {
             const list = document.getElementById('leaderboard');
             list.innerHTML = '';
-            teams.sort((a,b) => parseFloat(b.total) - parseFloat(a.total)).forEach((t, i) => {
+            // 排序並取前 10
+            teams.sort((a,b) => parseFloat(b.total) - parseFloat(a.total)).slice(0, 10).forEach((t, i) => {
                 const row = document.createElement('div');
                 row.className = "flex justify-between items-center bg-slate-700/50 p-2 rounded text-xs";
-                row.innerHTML = `<div class="flex items-center gap-2"><span class="font-bold ${i<3 ? 'text-yellow-400':'text-slate-500'}">#${i+1}</span><span class="text-slate-300">${t.id}</span></div><span class="font-mono text-emerald-400 font-bold">${t.total}</span>`;
+                row.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold ${i<3 ? 'text-yellow-400':'text-slate-500'} w-4">#${i+1}</span>
+                        <span class="text-slate-300 truncate max-w-[100px]">${t.id}</span>
+                    </div>
+                    <span class="font-mono text-emerald-400 font-bold">${t.total}</span>
+                `;
                 list.appendChild(row);
             });
         }
 
         window.clearAllData = async () => {
-            if(!db) { alert("模擬模式無法清除"); return; }
-            if(confirm("確定要重置所有小組數據嗎？")) {
-                const q = collection(db, "sessions");
+            if (!currentUser) return;
+            if (confirm("⚠️ 警告：這將會刪除所有小組的進度！確定要重置嗎？")) {
+                const q = collection(db, 'artifacts', appId, 'public', 'data', 'sessions');
                 const snapshot = await getDocs(q);
-                await Promise.all(snapshot.docs.map(doc => deleteDoc(doc.ref)));
-                const q2 = collection(db, "decisions");
-                const snapshot2 = await getDocs(q2);
-                await Promise.all(snapshot2.docs.map(doc => deleteDoc(doc.ref)));
+                const batch = [];
+                snapshot.docs.forEach(doc => {
+                    deleteDoc(doc.ref);
+                });
                 alert("課程已重置！");
             }
         };
 
-        // Sync Logic
+        // --- 同步邏輯 (Sync Logic) ---
         function startSync() {
-            if (!db) { updateUI(); calcScore(); return; }
-            const ref = doc(db, "sessions", window.userState.team);
-            unsubscribe = onSnapshot(ref, (snap) => {
+            if (!currentUser) return;
+            // 使用正確的巢狀路徑
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sessions', window.userState.team);
+            
+            unsubscribe = onSnapshot(docRef, (snap) => {
                 if(snap.exists()) {
                     const data = snap.data();
+                    // 合併遠端數據到本地
                     window.teamState = { ...window.teamState, ...data };
-                    updateUI(); calcScore(); 
-                    if(data.lastLog) addLog(data.lastLog);
-                } else { setDoc(ref, window.teamState); }
+                    updateUI(); 
+                    calcScore(); 
+                    if(data.lastLog && data.lastLog !== window.teamState.lastLogLocal) {
+                        addLog(data.lastLog);
+                        window.teamState.lastLogLocal = data.lastLog;
+                    }
+                } else {
+                    // 若文檔不存在，創建初始狀態
+                    setDoc(docRef, window.teamState);
+                }
+            }, (error) => {
+                console.error("Student sync error:", error);
+                addLog("連線異常，正在重試...");
             });
         }
 
         window.updateTeamState = async (key, val) => {
+            // 更新本地
             window.teamState[key] = val;
-            calcScore(); updateUI();
+            calcScore();
+            updateUI(); // 確保本地 UI 即時響應 (Optimistic UI)
+
+            if (!currentUser) return;
+
             const roleMap = { 'engineer':'工程師', 'cfo':'財務長', 'pr':'公關', 'policy':'分析師', 'eco':'生態員' };
             const logMsg = `${roleMap[window.userState.role]} 調整了參數`;
-            if(db) {
-                const ref = doc(db, "sessions", window.userState.team);
-                await setDoc(ref, { [key]: val, lastLog: logMsg, timestamp: serverTimestamp() }, { merge: true });
+            
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sessions', window.userState.team);
+            
+            try {
+                await setDoc(docRef, { 
+                    [key]: val, 
+                    lastLog: logMsg, 
+                    timestamp: serverTimestamp() 
+                }, { merge: true });
+            } catch (e) {
+                console.error("Update failed:", e);
+                addLog("上傳失敗，請檢查網路");
             }
         };
 
         function updateUI() {
             const s = window.teamState;
-            setSlider('safety', s.safety); setSlider('pr', s.pr); setSlider('eco', s.eco); setSlider('cfo', s.cfo);
+            // 只有當元素未被鎖定時才更新 value，避免干擾使用者拖曳 (雖然 Optimistic UI 會更新)
+            // 但這裡主要用於接收隊友的更新
+            updateSliderIfNotDragging('safety', s.safety);
+            updateSliderIfNotDragging('pr', s.pr);
+            updateSliderIfNotDragging('eco', s.eco);
+            updateSliderIfNotDragging('cfo', s.cfo);
+
             ['A','B','C'].forEach(site => {
                 const btn = document.getElementById(`btn-${site}`);
-                if(site === s.site) btn.className = "site-card p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 ring-2 ring-emerald-200 text-center";
-                else btn.className = "site-card p-3 rounded-xl border-2 border-slate-100 text-center opacity-60";
+                if (btn) {
+                    if(site === s.site) btn.className = "site-card p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 ring-2 ring-emerald-200 text-center";
+                    else btn.className = "site-card p-3 rounded-xl border-2 border-slate-100 text-center opacity-60 hover:opacity-100";
+                }
             });
         }
-        function setSlider(id, val) {
+        
+        function updateSliderIfNotDragging(id, val) {
             const el = document.getElementById(`slider-${id}`);
-            if(el) el.value = val;
-            const labels = ['低','偏低','標準','偏高','高'];
-            const txt = document.getElementById(`val-${id}`);
-            if(txt) txt.innerText = labels[val-1] || '標準';
+            // 如果這是使用者自己的角色控制的滑桿，且正在操作中，則暫不從外部覆寫
+            // 這裡簡化處理：直接更新，因為 oninput 頻率很高
+            if (el) {
+                el.value = val;
+                const labels = ['低','偏低','標準','偏高','高'];
+                const txt = document.getElementById(`val-${id}`);
+                if(txt) txt.innerText = labels[val-1] || '標準';
+            }
         }
 
         function addLog(msg) {
             const log = document.getElementById('system-log');
             const div = document.createElement('div');
-            div.innerText = `> ${msg}`;
+            const time = new Date().toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+            div.innerHTML = `<span class="text-slate-600">[${time}]</span> ${msg}`;
             log.prepend(div);
-        }
-
-        function applyPermissions() {
-            const r = window.userState.role;
-            if(r !== 'engineer') lockUI('safety');
-            if(r !== 'pr') lockUI('pr');
-            if(r !== 'eco') lockUI('eco');
-            if(r !== 'cfo') lockUI('cfo');
-            if(r !== 'policy') {
-                document.getElementById('lock-site').classList.remove('hidden');
-            }
-        }
-        function lockUI(id) {
-            document.getElementById(`slider-${id}`).disabled = true;
-            document.getElementById(`lock-${id}`).classList.remove('hidden');
         }
 
         window.submitFinalDecision = async () => {
             const btn = document.getElementById('submit-btn');
-            btn.innerHTML = "傳送中...";
-            if (!db) {
-                setTimeout(() => { alert("【模擬模式】決策已提交！"); btn.innerHTML = "已送出 (模擬)"; btn.disabled = true; }, 500);
-                return;
-            }
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin mr-2"></i> 傳送中...`;
+            lucide.createIcons();
+            
+            if (!currentUser) return;
+
             try {
-                await addDoc(collection(db, "decisions"), {
+                // 路徑修正: artifacts/{appId}/public/data/decisions
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'decisions'), {
                     site: window.teamState.site,
                     scores: calcScore(true),
                     user: window.userState.team,
                     timestamp: serverTimestamp()
                 });
                 alert("已送出至戰情室！");
-                btn.innerHTML = "已送出";
+                btn.innerHTML = `已送出 <i data-lucide="check" class="w-4 h-4 ml-1"></i>`;
+                btn.className = "bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 cursor-default";
                 btn.disabled = true;
-            } catch(e) { console.error(e); alert("上傳失敗：" + e.message); btn.innerHTML = "提交失敗"; }
+                lucide.createIcons();
+            } catch(e) { 
+                console.error(e); 
+                alert("上傳失敗：" + e.message); 
+                btn.innerHTML = "提交失敗 - 請重試"; 
+            }
         }
 
+        // --- 核心算法 (Core Logic) ---
         const sites = { 'A': {s:85,e:20,o:95}, 'B': {s:50,e:95,o:15}, 'C': {s:70,e:60,o:55} };
+        
         function calcScoreStatic(st) {
-            const base = sites[st.site].base;
-            let s = Math.min(100, Math.max(0, base.s + (st.safety * 5) + (st.eco * 2) - (st.cfo * 3)));
+            // 防止數據尚未載入
+            if (!st || !st.site) return { s:0, e:0, o:0, total:0 };
+            
+            const base = sites[st.site] || sites['A'];
+            const safety = parseInt(st.safety) || 3;
+            const eco = parseInt(st.eco) || 2;
+            const cfo = parseInt(st.cfo) || 2;
+            const pr = parseInt(st.pr) || 2;
+
+            let s = Math.min(100, Math.max(0, base.s + (safety * 5) + (eco * 2) - (cfo * 3)));
             if(st.site === 'B') s -= 10;
-            let cost = (Math.pow(st.safety, 1.2)*3) + (st.pr * 5) + (st.eco * 4);
-            let e = Math.min(100, Math.max(0, base.e + (st.cfo * 8) - cost));
-            let o = Math.min(100, Math.max(0, base.o + (st.pr * 8) + (st.eco * 3) - (st.cfo * 2)));
+            
+            let cost = (Math.pow(safety, 1.2)*3) + (pr * 5) + (eco * 4);
+            let e = Math.min(100, Math.max(0, base.e + (cfo * 8) - cost));
+            
+            let o = Math.min(100, Math.max(0, base.o + (pr * 8) + (eco * 3) - (cfo * 2)));
             if(st.site === 'B' && s < 60) o -= 20;
+            
             const total = ((s*0.4)+(e*0.25)+(o*0.35)).toFixed(1);
             return { s, e, o, total };
         }
@@ -523,7 +638,10 @@
                 document.getElementById('score-economy').innerText = parseInt(res.e);
                 document.getElementById('score-social').innerText = parseInt(res.o);
                 document.getElementById('footer-score').innerText = res.total;
-                if(chart) { chart.data.datasets[0].data = [res.s, res.e, res.o]; chart.update(); }
+                if(chart) { 
+                    chart.data.datasets[0].data = [res.s, res.e, res.o]; 
+                    chart.update(); 
+                }
             }
             return res;
         }
@@ -531,23 +649,91 @@
         let adminPie, adminBar;
         function updateAdminCharts(teams, stats) {
             const count = teams.length || 1;
+            
+            // Pie Chart
             if(!adminPie) {
                 const ctx = document.getElementById('adminPieChart').getContext('2d');
-                adminPie = new Chart(ctx, { type: 'doughnut', data: { labels: ['外海','工業','深山'], datasets:[{data:[0,0,0], backgroundColor:['#3b82f6','#f59e0b','#10b981'], borderColor:'#1e293b'}] }, options: { plugins: { legend: { labels: { color: '#cbd5e1' } } } } });
+                adminPie = new Chart(ctx, { 
+                    type: 'doughnut', 
+                    data: { 
+                        labels: ['外海','工業','深山'], 
+                        datasets:[{
+                            data:[0,0,0], 
+                            backgroundColor:['#3b82f6','#f59e0b','#10b981'], 
+                            borderColor:'#1e293b',
+                            borderWidth: 2
+                        }] 
+                    }, 
+                    options: { 
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: '#cbd5e1' } } } 
+                    } 
+                });
             }
-            adminPie.data.datasets[0].data = [stats.A, stats.B, stats.C]; adminPie.update();
+            adminPie.data.datasets[0].data = [stats.A, stats.B, stats.C]; 
+            adminPie.update();
 
+            // Bar Chart
             if(!adminBar) {
                 const ctx = document.getElementById('adminBarChart').getContext('2d');
-                adminBar = new Chart(ctx, { type: 'bar', data: { labels: ['安全','經濟','社會'], datasets:[{label:'全班平均', data:[0,0,0], backgroundColor:['#3b82f6','#f59e0b','#10b981']}] }, options: { scales: { y: { beginAtZero:true, max:100, grid:{color:'#334155'}, ticks:{color:'#94a3b8'} }, x: { grid:{display:false}, ticks:{color:'#94a3b8'} } }, plugins: { legend: { display:false } } } });
+                adminBar = new Chart(ctx, { 
+                    type: 'bar', 
+                    data: { 
+                        labels: ['安全','經濟','社會'], 
+                        datasets:[{
+                            label:'全班平均', 
+                            data:[0,0,0], 
+                            backgroundColor:['#3b82f6','#f59e0b','#10b981'],
+                            borderRadius: 6
+                        }] 
+                    }, 
+                    options: { 
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { 
+                            y: { beginAtZero:true, max:100, grid:{color:'#334155'}, ticks:{color:'#94a3b8'} }, 
+                            x: { grid:{display:false}, ticks:{color:'#94a3b8'} } 
+                        }, 
+                        plugins: { legend: { display:false } } 
+                    } 
+                });
             }
-            adminBar.data.datasets[0].data = [stats.s/count, stats.e/count, stats.o/count]; adminBar.update();
+            adminBar.data.datasets[0].data = [stats.s/count, stats.e/count, stats.o/count]; 
+            adminBar.update();
         }
 
         window.onload = () => {
             if(document.getElementById('radarChart')) {
                 const ctx = document.getElementById('radarChart').getContext('2d');
-                chart = new Chart(ctx, { type: 'radar', data: { labels: ['安全性', '經濟', '社會'], datasets: [{ data: [50,50,50], backgroundColor: 'rgba(16,185,129,0.2)', borderColor: '#10b981', borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 100, ticks: { display: false } } }, plugins: { legend: { display: false } } } });
+                chart = new Chart(ctx, { 
+                    type: 'radar', 
+                    data: { 
+                        labels: ['安全性', '經濟', '社會'], 
+                        datasets: [{ 
+                            data: [50,50,50], 
+                            backgroundColor: 'rgba(16,185,129,0.2)', 
+                            borderColor: '#10b981', 
+                            borderWidth: 2,
+                            pointBackgroundColor: '#10b981'
+                        }] 
+                    }, 
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        scales: { 
+                            r: { 
+                                min: 0, 
+                                max: 100, 
+                                ticks: { display: false },
+                                grid: { color: '#e2e8f0' },
+                                angleLines: { color: '#e2e8f0' },
+                                pointLabels: { font: { size: 12, weight: 'bold' }, color: '#64748b' }
+                            } 
+                        }, 
+                        plugins: { legend: { display: false } } 
+                    } 
+                });
             }
             lucide.createIcons();
         };
