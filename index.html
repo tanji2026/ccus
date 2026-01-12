@@ -48,7 +48,7 @@
         <div class="w-full max-w-sm space-y-4">
             <div>
                 <label class="text-xs font-bold text-slate-400 uppercase ml-1">小組名稱 / 教師代碼</label>
-                <input type="text" id="login-team" placeholder="輸入小組名 (或 880619)" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 text-white font-bold focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                <input type="text" id="login-team" placeholder="輸入小組名稱" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 text-white font-bold focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
             </div>
             
             <div id="role-selector" class="transition-all duration-300">
@@ -236,10 +236,19 @@
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // ================= CONFIG =================
-        const firebaseConfig = JSON.parse('{"apiKey":"AIzaSyDMBE9BjTJb70xm8c5WOZaIITxI0PmYWNc","authDomain":"tanji-ccus.firebaseapp.com","projectId":"tanji-ccus","storageBucket":"tanji-ccus.firebasestorage.app","messagingSenderId":"118576059306","appId":"1:118576059306:web:8f1c7e87b49d4d388651d3"}');
+        // 修改：使用環境變數 __firebase_config 以確保在預覽環境正確連線
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyDMBE9BjTJb70xm8c5WOZaIITxI0PmYWNc",
+            authDomain: "tanji-ccus.firebaseapp.com",
+            projectId: "tanji-ccus",
+            storageBucket: "tanji-ccus.firebasestorage.app",
+            messagingSenderId: "118576059306",
+            appId: "1:118576059306:web:8f1c7e87b49d4d388651d3"
+        };
         
         let db, auth, currentUser, unsubscribe;
-        const appId = "tanji-ccus-v1"; // 應用程式 ID，用於路徑隔離
+        // 修改：使用環境 app_id 變數，若無則使用預設值
+        const appId = typeof __app_id !== 'undefined' ? __app_id : "tanji-ccus-v1";
         const ADMIN_HASH = "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"; // SHA-256 for 880619
 
         // 狀態管理
