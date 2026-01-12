@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>碳吉 TanJi - 小組角色任務卡</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background: #e2e8f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        
+        /* 列印設定：隱藏按鈕，調整邊距 */
+        @media print {
+            body { background: white; padding: 0; }
+            .no-print { display: none !important; }
+            .page-break { page-break-inside: avoid; }
+            .card-container { gap: 10px; }
+            @page { margin: 1cm; size: landscape; }
+        }
+
+        .role-card {
+            background: white;
+            border: 2px solid;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        /* 螢幕預覽時的效果 */
+        @media screen {
+            .role-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        }
+
+        .bg-pattern {
+            background-image: radial-gradient(currentColor 1px, transparent 1px);
+            background-size: 10px 10px;
+            opacity: 0.1;
+        }
+    </style>
+</head>
+<body class="p-8 min-h-screen flex flex-col items-center">
+
+    <!-- 操作說明 (列印時會隱藏) -->
+    <div class="no-print mb-8 text-center max-w-2xl">
+        <h1 class="text-3xl font-black text-slate-800 mb-2">角色任務卡產生器</h1>
+        <p class="text-slate-600 mb-4">這是根據教案附件六製作的實體卡片。請按 <kbd class="px-2 py-1 bg-white border rounded shadow-sm text-sm">Ctrl + P</kbd> 或 <kbd class="px-2 py-1 bg-white border rounded shadow-sm text-sm">⌘ + P</kbd> 列印。</p>
+        <div class="bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2 rounded text-sm inline-block">
+            💡 提示：列印時請記得勾選「列印背景圖形 (Background graphics)」，色彩才會正確顯示。
+        </div>
+    </div>
+
+    <!-- 卡片網格 (3x2 排列，剛好一張 A4 稍微縮放或兩張 A4) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl card-container">
+
+        <!-- A: 環境工程師 -->
+        <div class="role-card page-break rounded-2xl border-blue-500 shadow-lg text-slate-800 h-[400px] flex flex-col">
+            <!-- Header -->
+            <div class="bg-blue-600 text-white p-4 flex justify-between items-center relative overflow-hidden">
+                <div class="bg-pattern absolute inset-0 text-blue-900"></div>
+                <div class="relative z-10">
+                    <div class="text-xs font-bold opacity-80 tracking-widest">ROLE A</div>
+                    <h2 class="text-2xl font-black">環境工程師</h2>
+                </div>
+                <div class="relative z-10 bg-white/20 p-2 rounded-lg backdrop-blur-sm">
+                    <i data-lucide="hard-hat" class="w-8 h-8"></i>
+                </div>
+            </div>
+            
+            <!-- Body -->
+            <div class="p-6 flex-1 flex flex-col gap-4 bg-blue-50/50">
+                <!-- Values -->
+                <div class="flex gap-2">
+                    <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded">🛡️ 安全第一</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded">🔬 科學數據</span>
+                </div>
+                
+                <!-- Task -->
+                <div class="flex-1">
+                    <h3 class="text-sm font-bold text-slate-400 uppercase mb-1">你的任務</h3>
+                    <p class="text-sm font-medium leading-relaxed">
+                        堅持要求將監測強度調高，確保無洩漏風險，即使這會花很多錢。你是團隊的安全守門員。
+                    </p>
+                </div>
+
+                <!-- Permission -->
+                <div class="bg-white border border-blue-200 p-3 rounded-xl flex items-center gap-3">
+                    <div class="bg-blue-100 p-2 rounded-lg text-blue-600">
+                        <i data-lucide="sliders" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase">系統權限</div>
+                        <div class="text-sm font-bold text-blue-900">控制 [安全監測] 滑桿</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Quote -->
+            <div class="p-4 bg-white border-t border-blue-100 text-center italic text-blue-800 font-bold text-sm">
+                "如果洩漏，我們就完了！"
+            </div>
+        </div>
+
+        <!-- B: 財務長 -->
+        <div class="role-card page-break rounded-2xl border-rose-500 shadow-lg text-slate-800 h-[400px] flex flex-col">
+            <div class="bg-rose-600 text-white p-4 flex justify-between items-center relative overflow-hidden">
+                <div class="bg-pattern absolute inset-0 text-rose-900"></div>
+                <div class="relative z-10">
+                    <div class="text-xs font-bold opacity-80 tracking-widest">ROLE B</div>
+                    <h2 class="text-2xl font-black">財務長</h2>
+                </div>
+                <div class="relative z-10 bg-white/20 p-2 rounded-lg backdrop-blur-sm">
+                    <i data-lucide="piggy-bank" class="w-8 h-8"></i>
+                </div>
+            </div>
+            
+            <div class="p-6 flex-1 flex flex-col gap-4 bg-rose-50/50">
+                <div class="flex gap-2">
+                    <span class="px-2 py-1 bg-rose-100 text-rose-700 text-xs font-bold rounded">💰 成本效益</span>
+                    <span class="px-2 py-1 bg-rose-100 text-rose-700 text-xs font-bold rounded">📈 股東利益</span>
+                </div>
+                
+                <div class="flex-1">
+                    <h3 class="text-sm font-bold text-slate-400 uppercase mb-1">你的任務</h3>
+                    <p class="text-sm font-medium leading-relaxed">
+                        計算總成本，當隊友要求昂貴設備時，你要負責踩煞車，避免赤字。每一分錢都要花在刀口上。
+                    </p>
+                </div>
+
+                <div class="bg-white border border-rose-200 p-3 rounded-xl flex items-center gap-3">
+                    <div class="bg-rose-100 p-2 rounded-lg text-rose-600">
+                        <i data-lucide="sliders" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase">系統權限</div>
+                        <div class="text-sm font-bold text-rose-900">控制 [預算緊縮] 滑桿</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-white border-t border-rose-100 text-center italic text-rose-800 font-bold text-sm">
+                "公司不是做慈善的！"
+            </div>
+        </div>
+
+        <!-- C: 公關經理 -->
+        <div class="role-card page-break rounded-2xl border-amber-500 shadow-lg text-slate-800 h-[400px] flex flex-col">
+            <div class="bg-amber-500 text-white p-4 flex justify-between items-center relative overflow-hidden">
+                <div class="bg-pattern absolute inset-0 text-amber-800"></div>
+                <div class="relative z-10">
+                    <div class="text-xs font-bold opacity-80 tracking-widest">ROLE C</div>
+                    <h2 class="text-2xl font-black">公關經理</h2>
+                </div>
+                <div class="relative z-10 bg-white/20 p-2 rounded-lg backdrop-blur-sm">
+                    <i data-lucide="megaphone" class="w-8 h-8"></i>
+                </div>
+            </div>
+            
+            <div class="p-6 flex-1 flex flex-col gap-4 bg-amber-50/50">
+                <div class="flex gap-2">
+                    <span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded">🤝 社會形象</span>
+                    <span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded">🏘️ 居民關係</span>
+                </div>
+                
+                <div class="flex-1">
+                    <h3 class="text-sm font-bold text-slate-400 uppercase mb-1">你的任務</h3>
+                    <p class="text-sm font-medium leading-relaxed">
+                        評估選址對居民影響，爭取合理回饋金，確保民眾不抗議。你是公司與社區的橋樑。
+                    </p>
+                </div>
+
+                <div class="bg-white border border-amber-200 p-3 rounded-xl flex items-center gap-3">
+                    <div class="bg-amber-100 p-2 rounded-lg text-amber-600">
+                        <i data-lucide="sliders" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase">系統權限</div>
+                        <div class="text-sm font-bold text-amber-900">控制 [回饋金] 滑桿</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-white border-t border-amber-100 text-center italic text-amber-800 font-bold text-sm">
+                "沒有社會許可，工程動不了！"
+            </div>
+        </div>
+
+        <!-- D: 政策分析師 -->
+        <div class="role-card page-break rounded-2xl border-indigo-500 shadow-lg text-slate-800 h-[400px] flex flex-col">
+            <div class="bg-indigo-600 text-white p-4 flex justify-between items-center relative overflow-hidden">
+                <div class="bg-pattern absolute inset-0 text-indigo-900"></div>
+                <div class="relative z-10">
+                    <div class="text-xs font-bold opacity-80 tracking-widest">ROLE D</div>
+                    <h2 class="text-2xl font-black">政策分析師</h2>
+                </div>
+                <div class="relative z-10 bg-white/20 p-2 rounded-lg backdrop-blur-sm">
+                    <i data-lucide="scale" class="w-8 h-8"></i>
+                </div>
+            </div>
+            
+            <div class="p-6 flex-1 flex flex-col gap-4 bg-indigo-50/50">
+                <div class="flex gap-2">
+                    <span class="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded">⚖️ 法規合規</span>
+                    <span class="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-bold rounded">📜 政府關係</span>
+                </div>
+                
+                <div class="flex-1">
+                    <h3 class="text-sm font-bold text-slate-400 uppercase mb-1">你的任務</h3>
+                    <p class="text-sm font-medium leading-relaxed">
+                        擔任隊長，協調各方意見，確保最終方案符合國家 2050 淨零政策，並在共識後按下提交鍵。
+                    </p>
+                </div>
+
+                <div class="bg-white border border-indigo-200 p-3 rounded-xl flex items-center gap-3">
+                    <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600">
+                        <i data-lucide="mouse-pointer-click" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase">系統權限</div>
+                        <div class="text-sm font-bold text-indigo-900">控制 [選址] 與 [提交]</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-white border-t border-indigo-100 text-center italic text-indigo-800 font-bold text-sm">
+                "我們需要一個平衡的方案。"
+            </div>
+        </div>
+
+        <!-- E: 生態保育員 -->
+        <div class="role-card page-break rounded-2xl border-emerald-500 shadow-lg text-slate-800 h-[400px] flex flex-col">
+            <div class="bg-emerald-600 text-white p-4 flex justify-between items-center relative overflow-hidden">
+                <div class="bg-pattern absolute inset-0 text-emerald-900"></div>
+                <div class="relative z-10">
+                    <div class="text-xs font-bold opacity-80 tracking-widest">ROLE E</div>
+                    <h2 class="text-2xl font-black">生態保育員</h2>
+                </div>
+                <div class="relative z-10 bg-white/20 p-2 rounded-lg backdrop-blur-sm">
+                    <i data-lucide="leaf" class="w-8 h-8"></i>
+                </div>
+            </div>
+            
+            <div class="p-6 flex-1 flex flex-col gap-4 bg-emerald-50/50">
+                <div class="flex gap-2">
+                    <span class="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded">🌱 環境永續</span>
+                    <span class="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded">🦋 生物多樣性</span>
+                </div>
+                
+                <div class="flex-1">
+                    <h3 class="text-sm font-bold text-slate-400 uppercase mb-1">你的任務</h3>
+                    <p class="text-sm font-medium leading-relaxed">
+                        反對在深山或海洋敏感區開發，要求避開保護區或增加補償預算。你是無聲大自然的代言人。
+                    </p>
+                </div>
+
+                <div class="bg-white border border-emerald-200 p-3 rounded-xl flex items-center gap-3">
+                    <div class="bg-emerald-100 p-2 rounded-lg text-emerald-600">
+                        <i data-lucide="sliders" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase">系統權限</div>
+                        <div class="text-sm font-bold text-emerald-900">控制 [生態補償] 滑桿</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-white border-t border-emerald-100 text-center italic text-emerald-800 font-bold text-sm">
+                "大自然是無價的！"
+            </div>
+        </div>
+
+        <!-- 封底/使用說明 -->
+        <div class="role-card page-break rounded-2xl border-slate-300 border-dashed shadow-sm text-slate-500 h-[400px] flex flex-col justify-center items-center p-8 text-center bg-slate-50">
+            <div class="mb-4 bg-white p-4 rounded-full shadow-sm">
+                <i data-lucide="users" class="w-10 h-10 text-slate-400"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2">角色分配說明</h3>
+            <p class="text-sm leading-relaxed max-w-xs">
+                請將此頁面列印後剪裁。
+                <br>分組時，請小組長以「抽籤」方式分配角色，
+                拿到卡片的人即負責該職位，並掃描 QR Code 登入系統。
+            </p>
+            <div class="mt-8 text-xs text-slate-400">
+                碳吉 TanJi 模擬器 V13.6 教具配件
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
