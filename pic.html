@@ -170,7 +170,7 @@
         <div class="caption">圖 1：系統架構展示前端互動、邏輯運算與雲端資料庫的即時整合</div>
     </div>
 
-    <!-- Sheet 2: User Flow -->
+    <!-- Sheet 2: User Flow (Updated with Debrief) -->
     <div class="paper-sheet">
         <h1>圖二：教學互動流程圖 (Teaching Workflow)</h1>
         
@@ -182,90 +182,97 @@
             </defs>
 
             <!-- Role Section -->
-            <g transform="translate(50, 50)">
-                <rect x="0" y="0" width="700" height="80" rx="10" fill="#f0fdf4" stroke="#10b981"/>
-                <text x="350" y="25" text-anchor="middle" font-weight="bold" fill="#047857">5 大角色分權 (Role Assignment)</text>
+            <g transform="translate(50, 30)">
+                <rect x="0" y="0" width="700" height="70" rx="10" fill="#f0fdf4" stroke="#10b981"/>
+                <text x="350" y="25" text-anchor="middle" font-weight="bold" fill="#047857">0. 角色分配 (Role Assignment)</text>
                 
-                <g transform="translate(30, 40)">
+                <g transform="translate(30, 35)">
                     <circle cx="20" cy="20" r="15" fill="#3b82f6"/><text x="20" y="25" text-anchor="middle" fill="white" font-size="10">工</text>
                     <text x="50" y="25" font-size="12">工程師</text>
                 </g>
-                <g transform="translate(160, 40)">
+                <g transform="translate(160, 35)">
                     <circle cx="20" cy="20" r="15" fill="#f59e0b"/><text x="20" y="25" text-anchor="middle" fill="white" font-size="10">財</text>
                     <text x="50" y="25" font-size="12">財務長</text>
                 </g>
-                <g transform="translate(290, 40)">
+                <g transform="translate(290, 35)">
                     <circle cx="20" cy="20" r="15" fill="#10b981"/><text x="20" y="25" text-anchor="middle" fill="white" font-size="10">公</text>
                     <text x="50" y="25" font-size="12">公關</text>
                 </g>
-                <g transform="translate(420, 40)">
+                <g transform="translate(420, 35)">
                     <circle cx="20" cy="20" r="15" fill="#8b5cf6"/><text x="20" y="25" text-anchor="middle" fill="white" font-size="10">政</text>
                     <text x="50" y="25" font-size="12">分析師</text>
                 </g>
-                <g transform="translate(550, 40)">
+                <g transform="translate(550, 35)">
                     <circle cx="20" cy="20" r="15" fill="#ec4899"/><text x="20" y="25" text-anchor="middle" fill="white" font-size="10">生</text>
                     <text x="50" y="25" font-size="12">生態員</text>
                 </g>
             </g>
 
             <!-- Flow Steps -->
-            <g transform="translate(50, 180)">
+            <g transform="translate(50, 140)">
                 <!-- Step 1 -->
                 <g>
                     <circle cx="30" cy="30" r="25" fill="#1e293b"/>
                     <text x="30" y="38" text-anchor="middle" fill="white" font-weight="bold" font-size="18">1</text>
-                    <rect x="70" y="0" width="130" height="60" rx="5" fill="#fff" stroke="#1e293b" stroke-width="2"/>
-                    <text x="135" y="25" text-anchor="middle" class="text-dark">小組登入</text>
-                    <text x="135" y="45" text-anchor="middle" class="text-sub">輸入相同組名</text>
+                    <rect x="70" y="0" width="120" height="60" rx="5" fill="#fff" stroke="#1e293b" stroke-width="2"/>
+                    <text x="130" y="25" text-anchor="middle" class="text-dark">小組登入</text>
+                    <text x="130" y="45" text-anchor="middle" class="text-sub">輸入相同組名</text>
                 </g>
 
-                <line x1="200" y1="30" x2="250" y2="30" stroke="#1e293b" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+                <line x1="190" y1="30" x2="230" y2="30" stroke="#1e293b" stroke-width="2" marker-end="url(#arrowhead-green)"/>
 
                 <!-- Step 2 -->
-                <g transform="translate(250, 0)">
+                <g transform="translate(230, 0)">
                     <circle cx="30" cy="30" r="25" fill="#1e293b"/>
                     <text x="30" y="38" text-anchor="middle" fill="white" font-weight="bold" font-size="18">2</text>
-                    <rect x="70" y="0" width="130" height="60" rx="5" fill="#fff" stroke="#1e293b" stroke-width="2"/>
-                    <text x="135" y="25" text-anchor="middle" class="text-dark">分權操作</text>
-                    <text x="135" y="45" text-anchor="middle" class="text-sub">僅能操作職責項目</text>
+                    <rect x="70" y="0" width="120" height="60" rx="5" fill="#fff" stroke="#1e293b" stroke-width="2"/>
+                    <text x="130" y="25" text-anchor="middle" class="text-dark">分權決策</text>
+                    <text x="130" y="45" text-anchor="middle" class="text-sub">調整負責參數</text>
                 </g>
 
-                <line x1="450" y1="30" x2="500" y2="30" stroke="#1e293b" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+                <line x1="420" y1="30" x2="460" y2="30" stroke="#1e293b" stroke-width="2" marker-end="url(#arrowhead-green)"/>
 
                 <!-- Step 3 -->
-                <g transform="translate(500, 0)">
+                <g transform="translate(460, 0)">
                     <circle cx="30" cy="30" r="25" fill="#1e293b"/>
                     <text x="30" y="38" text-anchor="middle" fill="white" font-weight="bold" font-size="18">3</text>
-                    <rect x="70" y="0" width="130" height="60" rx="5" fill="#fff" stroke="#1e293b" stroke-width="2"/>
-                    <text x="135" y="25" text-anchor="middle" class="text-dark">即時同步</text>
-                    <text x="135" y="45" text-anchor="middle" class="text-sub">Team Sync 機制</text>
+                    <rect x="70" y="0" width="120" height="60" rx="5" fill="#fff" stroke="#1e293b" stroke-width="2"/>
+                    <text x="130" y="25" text-anchor="middle" class="text-dark">即時同步</text>
+                    <text x="130" y="45" text-anchor="middle" class="text-sub">SROI 動態計算</text>
                 </g>
             </g>
 
-            <!-- Bottom Flow -->
-            <path d="M 700 210 Q 750 210 750 260 L 750 300 Q 750 350 700 350" stroke="#10b981" stroke-width="2" fill="none"/>
-            <line x1="700" y1="350" x2="600" y2="350" stroke="#10b981" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+            <!-- Bottom Flow: To Admin & Debrief -->
+            <path d="M 680 170 Q 720 170 720 220 L 720 260 Q 720 310 680 310" stroke="#10b981" stroke-width="2" fill="none"/>
+            <line x1="680" y1="310" x2="600" y2="310" stroke="#10b981" stroke-width="2" marker-end="url(#arrowhead-green)"/>
 
             <!-- Admin Area -->
-            <g transform="translate(200, 310)">
-                <rect x="0" y="0" width="380" height="80" rx="10" fill="#1e293b"/>
-                <text x="190" y="30" text-anchor="middle" fill="#fff" font-weight="bold" font-size="16">教師戰情室 (War Room)</text>
-                <g transform="translate(30, 45)">
-                    <circle cx="10" cy="10" r="5" fill="#22c55e"/>
-                    <text x="25" y="15" fill="#94a3b8" font-size="12">全班數據彙整</text>
+            <g transform="translate(250, 270)">
+                <rect x="0" y="0" width="350" height="80" rx="10" fill="#1e293b"/>
+                <text x="175" y="30" text-anchor="middle" fill="#fff" font-weight="bold" font-size="16">教師戰情室 (War Room)</text>
+                
+                <g transform="translate(20, 45)">
+                    <text x="0" y="15" fill="#94a3b8" font-size="12">📊 全班數據彙整</text>
                 </g>
-                <g transform="translate(150, 45)">
-                    <circle cx="10" cy="10" r="5" fill="#22c55e"/>
-                    <text x="25" y="15" fill="#94a3b8" font-size="12">SROI 排行榜</text>
+                <g transform="translate(140, 45)">
+                    <text x="0" y="15" fill="#94a3b8" font-size="12">🏆 SROI 排行榜</text>
                 </g>
-                <g transform="translate(270, 45)">
-                    <circle cx="10" cy="10" r="5" fill="#ef4444"/>
-                    <text x="25" y="15" fill="#94a3b8" font-size="12">一鍵重置課程</text>
+                <g transform="translate(250, 45)">
+                    <text x="0" y="15" fill="#ef4444" font-size="12">🔄 一鍵重置</text>
                 </g>
+            </g>
+
+            <!-- New Step: Debrief (Flow back from Admin) -->
+             <line x1="250" y1="310" x2="200" y2="310" stroke="#10b981" stroke-width="2" marker-end="url(#arrowhead-green)"/>
+             
+             <g transform="translate(0, 270)">
+                <rect x="0" y="0" width="200" height="80" rx="10" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
+                <text x="100" y="30" text-anchor="middle" font-weight="bold" fill="#c2410c" font-size="16">4. 反思與討論 (Debrief)</text>
+                <text x="100" y="55" text-anchor="middle" fill="#ea580c" font-size="12">SROI 權衡分析 / 永續議題</text>
             </g>
 
         </svg>
-        <div class="caption">圖 2：基於 CSCL 理論設計的「角色分權」與「資料同步」流程</div>
+        <div class="caption">圖 2：包含「角色操作」到「數據反思」的完整數位教學互動循環</div>
     </div>
 
     <!-- Sheet 3: Student UI -->
