@@ -5,17 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="robots" content="noindex,nofollow">
     <title>碳吉 TanJi - CCUS 淨零決策模擬器</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Noto Sans TC', sans-serif; overscroll-behavior-y: none; }
-        /* 滑桿樣式優化 */
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%;
@@ -28,16 +23,62 @@
         .site-card:active { transform: scale(0.96); }
         .dashboard-enter { animation: slideUp 0.5s ease-out forwards; }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .glow-text { text-shadow: 0 0 10px rgba(255,255,255,0.5); }
         
-        /* 鎖定狀態的滑桿 */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .fade-out-up {
+            animation: fadeOutUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes fadeOutUp {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-100%); display: none; }
+        }
+
         input[type=range]:disabled { opacity: 0.5; cursor: not-allowed; }
         input[type=range]:disabled::-webkit-slider-thumb { border-color: #cbd5e1; background: #f1f5f9; box-shadow: none; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 h-[100dvh] flex flex-col overflow-hidden">
 
-    <!-- 登入畫面 -->
+    <div id="intro-splash" class="fixed inset-0 bg-gradient-to-br from-emerald-500 to-teal-700 z-[100] flex flex-col items-center justify-center p-6 text-white transition-all duration-700">
+        
+        <div class="relative mb-10 flex flex-col items-center">
+            
+            <div class="mb-4 bg-white text-slate-800 px-6 py-3 rounded-2xl shadow-xl transform -rotate-2 relative max-w-xs text-center border-4 border-emerald-200 animate-bounce" style="animation-duration: 2s;">
+                <p class="font-bold text-lg">嗨！我是碳吉 🌱</p>
+                <p class="text-sm text-slate-500 font-bold">準備好拯救地球了嗎？</p>
+                <div class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[12px] border-t-white"></div>
+            </div>
+
+            <div class="w-64 h-64 md:w-80 md:h-80 animate-float drop-shadow-2xl filter hover:brightness-110 transition-all cursor-pointer" onclick="dismissIntro()">
+                <img src="https://raw.githubusercontent.com/tanji2026/ccus/main/tanjibaby.png" 
+                     alt="碳吉吉祥物" 
+                     class="w-full h-full object-contain"
+                     id="mascot-img">
+            </div>
+            
+        </div>
+
+        <div class="space-y-4 text-center w-full max-w-sm">
+            <h1 class="text-4xl font-black tracking-tight text-white drop-shadow-md">碳吉 TanJi</h1>
+            <p class="text-emerald-100 font-bold tracking-widest text-sm mb-8">CCUS 淨零決策模擬系統</p>
+            
+            <button onclick="dismissIntro()" class="w-full bg-white text-emerald-600 px-8 py-4 rounded-2xl font-black text-xl shadow-[0_10px_20px_rgba(0,0,0,0.2)] hover:shadow-[0_15px_30px_rgba(0,0,0,0.3)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 group">
+                開始挑戰
+                <i data-lucide="arrow-right" class="group-hover:translate-x-1 transition-transform"></i>
+            </button>
+        </div>
+
+        <div class="absolute bottom-6 text-emerald-200/60 text-xs font-mono">Ver 2.0.1</div>
+    </div>
+
+
     <div id="login-screen" class="fixed inset-0 bg-slate-900 z-50 flex flex-col items-center justify-center p-6 text-white transition-opacity duration-500">
         <div class="w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl shadow-emerald-500/50">
             <i data-lucide="leaf" class="w-8 h-8 text-white"></i>
@@ -82,13 +123,11 @@
             </button>
         </div>
         
-        <!-- Login Footer -->
-        <div class="absolute bottom-6 text-[10px] text-slate-600 font-bold">
-            115年度第二屆CCUS創意教案
+        <div class="absolute bottom-6 text-[10px] text-slate-600 font-bold text-center w-full px-4">
+            115年度第二屆CCUS創意教案｜作品受著作權法保護，未經授權請勿複製轉載｜歡迎聯絡我們：tanji2026@gmail.com
         </div>
     </div>
 
-    <!-- 頂部導航 -->
     <nav class="bg-white shadow-sm border-b border-slate-200 flex-none z-30">
         <div class="container mx-auto px-4 h-14 flex justify-between items-center">
             <div class="flex items-center gap-2">
@@ -107,12 +146,9 @@
         </div>
     </nav>
 
-    <!-- 主內容區 (學生模擬器) -->
     <main id="main-student" class="flex-1 overflow-y-auto p-4 pb-40 no-scrollbar relative hidden">
         <div class="container mx-auto max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- 左側：決策面板 -->
             <div class="lg:col-span-7 space-y-4">
-                <!-- 選址區塊 -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
                     <div class="px-4 py-2 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
                         <h2 class="text-sm font-bold text-slate-700">1. 選址決策</h2>
@@ -123,11 +159,9 @@
                         <button onclick="updateTeamState('site', 'B')" id="btn-B" class="site-card p-3 rounded-xl border-2 border-slate-100 text-center"><div class="text-2xl mb-1">🏭</div><div class="text-xs font-bold">工業區</div></button>
                         <button onclick="updateTeamState('site', 'C')" id="btn-C" class="site-card p-3 rounded-xl border-2 border-slate-100 text-center"><div class="text-2xl mb-1">⛰️</div><div class="text-xs font-bold">深山</div></button>
                     </div>
-                    <!-- 鎖定遮罩 -->
                     <div id="lock-site" class="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center z-10 hidden cursor-not-allowed"><span class="text-xs font-bold text-slate-400 bg-white px-2 py-1 rounded border shadow-sm">🔒 僅分析師可操作</span></div>
                 </div>
 
-                <!-- 資源配置區塊 -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 relative overflow-hidden">
                         <div class="flex justify-between mb-2 items-center"><label class="text-sm font-bold text-slate-700 flex gap-1"><i data-lucide="shield-check" class="w-4 h-4 text-blue-500"></i> 安全監測</label><span class="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded font-bold">🔧 工程師</span></div>
@@ -156,7 +190,6 @@
                 </div>
             </div>
 
-            <!-- 右側：儀表板 -->
             <div class="lg:col-span-5 space-y-4">
                 <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-4">
                     <div class="flex justify-between items-center mb-2"><h3 class="font-bold text-slate-800">SROI 預測模型</h3><span class="text-[10px] text-slate-400">Team Sync Active</span></div>
@@ -176,13 +209,11 @@
             </div>
         </div>
         
-        <!-- Student View Footer -->
         <div class="mt-8 text-center text-[10px] text-slate-400 pb-4">
-            115年度第二屆CCUS創意教案
+            115年度第二屆CCUS創意教案｜作品受著作權法保護，未經授權請勿複製轉載｜歡迎聯絡我們：tanji2026@gmail.com
         </div>
     </main>
 
-    <!-- 教師總覽戰情室 (Admin Dashboard) -->
     <main id="main-admin" class="flex-1 overflow-y-auto p-4 md:p-8 no-scrollbar relative hidden bg-slate-900 text-white">
         <div class="container mx-auto max-w-7xl">
             <div class="flex justify-between items-center mb-8">
@@ -201,7 +232,6 @@
                 </div>
             </div>
 
-            <!-- 全班統計 -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
                     <h3 class="font-bold text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4"></i> 選址分佈</h3>
@@ -217,18 +247,15 @@
                 </div>
             </div>
 
-            <!-- 各組卡片 -->
             <h3 class="font-bold text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="grid" class="w-4 h-4"></i> 各組即時狀態</h3>
             <div id="team-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
             
-            <!-- Admin Footer -->
             <div class="mt-12 text-center text-[10px] text-slate-600">
-                115年度第二屆CCUS創意教案
+                115年度第二屆CCUS創意教案｜作品受著作權法保護，未經授權請勿複製轉載｜歡迎聯絡我們：tanji2026@gmail.com
             </div>
         </div>
     </main>
 
-    <!-- 底部操作區 (學生用) -->
     <div id="student-footer" class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-slate-200 p-4 z-40 shadow hidden">
         <div class="container mx-auto max-w-5xl flex justify-between items-center">
             <div class="flex flex-col">
@@ -243,14 +270,12 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp, collection, addDoc, getDocs, deleteDoc, query, orderBy } 
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // ================= CONFIG =================
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyDMBE9BjTJb70xm8c5WOZaIITxI0PmYWNc",
             authDomain: "tanji-ccus.firebaseapp.com",
@@ -261,15 +286,12 @@
         };
         
         let db, auth, currentUser, unsubscribe;
-        // 預設 appId
         const appId = typeof __app_id !== 'undefined' ? __app_id : "tanji-ccus-v1";
 
-        // 狀態管理
         window.userState = { team: "", role: "", isAdmin: false };
         window.teamState = { site: "A", safety: 3, pr: 2, eco: 2, cfo: 2, lastLog: "" };
-        let isDemoMode = false; // 離線/體驗模式旗標
+        let isDemoMode = false;
 
-        // 初始化
         async function initApp() {
             try {
                 if (!firebaseConfig || !firebaseConfig.apiKey) {
@@ -279,7 +301,6 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
                 
-                // 優先檢查是否有 token
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     try {
                         await signInWithCustomToken(auth, __initial_auth_token);
@@ -296,7 +317,6 @@
                         currentUser = user;
                         enableOnlineMode();
                     } else {
-                        // 理論上不會發生，但以防萬一
                         startDemoMode("Auth State Null");
                     }
                 });
@@ -310,19 +330,18 @@
             isDemoMode = false;
             document.getElementById('connection-indicator').innerHTML = `<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div><span class="text-[10px] font-bold text-green-600">已連線</span>`;
             const startBtn = document.getElementById('start-btn');
-            // 如果還卡在「系統載入中...」或「連線失敗」，重置它
             if (startBtn.innerText === "系統載入中..." || startBtn.innerText.includes("離線")) {
                 startBtn.disabled = true;
                 startBtn.className = "w-full bg-slate-700 text-slate-500 py-4 rounded-xl font-bold mt-4 transition-all shadow-lg";
                 startBtn.innerText = "請輸入小組名稱";
-                checkLoginInput(); // 重新檢查輸入狀態
+                checkLoginInput();
             }
         }
 
         function startDemoMode(reason) {
             console.warn("Switching to DEMO MODE due to:", reason);
             isDemoMode = true;
-            currentUser = { uid: 'demo-user', isAnonymous: true }; // Mock User
+            currentUser = { uid: 'demo-user', isAnonymous: true };
             
             document.getElementById('connection-indicator').innerHTML = `<div class="w-2 h-2 bg-amber-500 rounded-full"></div><span class="text-[10px] font-bold text-amber-600">體驗模式(離線)</span>`;
             
@@ -337,7 +356,6 @@
         
         initApp();
 
-        // 角色選擇邏輯
         window.selectRole = (role) => {
             window.userState.role = role;
             document.querySelectorAll('.role-btn').forEach(btn => {
@@ -352,11 +370,7 @@
             checkLoginInput();
         };
 
-        // 即時檢查輸入框 (修正後：移除對 Auth 狀態的依賴，允許直接輸入)
         window.checkLoginInput = () => {
-            // 修正：不再檢查 currentUser，允許尚未連線時也能觸發 UI 變更 (如顯示按鈕)
-            // if (!currentUser && !isDemoMode) return; 
-            
             const t = document.getElementById('login-team').value.trim();
             const btn = document.getElementById('start-btn');
             
@@ -367,7 +381,6 @@
                 return;
             }
 
-            // 直接檢查代碼，避免 Async 問題
             const isAdmin = (t === '880619');
             
             if (isAdmin) {
@@ -397,17 +410,14 @@
         
         document.getElementById('login-team').addEventListener('input', checkLoginInput);
 
-        // 進入模擬
         window.enterSimulation = async () => {
             const teamInput = document.getElementById('login-team').value.trim();
             
-            // 修正：如果尚未連線，顯示載入中提示並嘗試強制進入 (依賴 Demo Mode 或等待連線)
             if (!currentUser && !isDemoMode) { 
                 const btn = document.getElementById('start-btn');
                 const originalText = btn.innerHTML;
                 btn.innerText = "系統連線中...";
                 
-                // 等待 2 秒，如果還是沒連上，切換到 Demo Mode
                 await new Promise(r => setTimeout(r, 2000));
                 
                 if (!currentUser) {
@@ -427,7 +437,6 @@
             }
         };
 
-        // --- 學生端邏輯 ---
         function initStudentView() {
             document.getElementById('main-student').classList.remove('hidden');
             document.getElementById('student-footer').classList.remove('hidden');
@@ -436,7 +445,6 @@
             
             applyPermissions();
             startSync();
-            // 初始計算一次
             calcScore();
         }
 
@@ -462,18 +470,16 @@
             }
         }
 
-        // --- 老師端邏輯 ---
         function initAdminDashboard() {
             document.getElementById('main-admin').classList.remove('hidden');
             
             if (isDemoMode) {
-                // 離線模式：產生模擬數據
                 const demoTeams = [
                     { id: '第一組', site: 'A', safety: 3, pr: 2, eco: 2, cfo: 2, lastLog: '已連線', total: 78.5 },
                     { id: '第二組', site: 'B', safety: 4, pr: 4, eco: 3, cfo: 2, lastLog: '調整參數中', total: 65.2 },
                     { id: '第三組', site: 'C', safety: 2, pr: 1, eco: 5, cfo: 4, lastLog: '等待中', total: 82.1 }
                 ];
-                let stats = { A:1, B:1, C:1, s:250, e:200, o:210 }; // Mock stats
+                let stats = { A:1, B:1, C:1, s:250, e:200, o:210 };
                 document.getElementById('admin-team-count').innerText = "3 (Demo)";
                 updateAdminCharts(demoTeams, stats);
                 renderTeamCards(demoTeams);
@@ -481,7 +487,6 @@
                 return;
             }
 
-            // 路徑修正: artifacts/{appId}/public/data/sessions
             const q = collection(db, 'artifacts', appId, 'public', 'data', 'sessions');
             
             onSnapshot(q, (snapshot) => {
@@ -491,7 +496,6 @@
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     const scores = calcScoreStatic(data);
-                    // doc.id 即為小組名稱
                     teams.push({ id: doc.id, ...data, ...scores });
                     
                     if(stats[data.site] !== undefined) stats[data.site]++;
@@ -504,13 +508,10 @@
                 renderLeaderboard(teams);
             }, (error) => {
                 console.error("Admin sync error:", error);
-                // Admin 也可以降級到 Demo 模式顯示空數據或錯誤
                 alert("無法同步數據，切換至本機檢視模式");
-                // 這裡可以考慮自動切換到 Demo Mode 並重繪
             });
         }
 
-        // Admin UI Helpers
         function renderTeamCards(teams) {
             const container = document.getElementById('team-cards');
             container.innerHTML = '';
@@ -540,7 +541,6 @@
         function renderLeaderboard(teams) {
             const list = document.getElementById('leaderboard');
             list.innerHTML = '';
-            // 排序並取前 10
             teams.sort((a,b) => parseFloat(b.total) - parseFloat(a.total)).slice(0, 10).forEach((t, i) => {
                 const row = document.createElement('div');
                 row.className = "flex justify-between items-center bg-slate-700/50 p-2 rounded text-xs";
@@ -573,21 +573,17 @@
             }
         };
 
-        // --- 同步邏輯 (Sync Logic) ---
         function startSync() {
             if (isDemoMode) {
-                // 離線模式：只更新 UI，不連線
                 addLog("體驗模式：資料僅儲存於本地");
                 return;
             }
             if (!currentUser) return;
-            // 使用正確的巢狀路徑
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'sessions', window.userState.team);
             
             unsubscribe = onSnapshot(docRef, (snap) => {
                 if(snap.exists()) {
                     const data = snap.data();
-                    // 合併遠端數據到本地
                     window.teamState = { ...window.teamState, ...data };
                     updateUI(); 
                     calcScore(); 
@@ -596,27 +592,24 @@
                         window.teamState.lastLogLocal = data.lastLog;
                     }
                 } else {
-                    // 若文檔不存在，創建初始狀態
                     setDoc(docRef, window.teamState);
                 }
             }, (error) => {
                 console.error("Student sync error:", error);
                 addLog("連線中斷，切換至本地模式...");
-                startDemoMode(error.message); // 出錯時切換到 Demo
+                startDemoMode(error.message);
             });
         }
 
         window.updateTeamState = async (key, val) => {
-            // 更新本地
             window.teamState[key] = val;
             calcScore();
-            updateUI(); // 確保本地 UI 即時響應 (Optimistic UI)
+            updateUI();
 
             const roleMap = { 'engineer':'工程師', 'cfo':'財務長', 'pr':'公關', 'policy':'分析師', 'eco':'生態員' };
             const logMsg = `${roleMap[window.userState.role]} 調整了參數`;
 
             if (isDemoMode) {
-                // 離線模式：只記錄 Log
                 addLog(logMsg);
                 return;
             }
@@ -633,15 +626,12 @@
                 }, { merge: true });
             } catch (e) {
                 console.error("Update failed:", e);
-                // 不跳 alert 干擾操作，只在 log 顯示
                 addLog("同步失敗 (離線中)");
             }
         };
 
         function updateUI() {
             const s = window.teamState;
-            // 只有當元素未被鎖定時才更新 value，避免干擾使用者拖曳 (雖然 Optimistic UI 會更新)
-            // 但這裡主要用於接收隊友的更新
             updateSliderIfNotDragging('safety', s.safety);
             updateSliderIfNotDragging('pr', s.pr);
             updateSliderIfNotDragging('eco', s.eco);
@@ -658,8 +648,6 @@
         
         function updateSliderIfNotDragging(id, val) {
             const el = document.getElementById(`slider-${id}`);
-            // 如果這是使用者自己的角色控制的滑桿，且正在操作中，則暫不從外部覆寫
-            // 這裡簡化處理：直接更新，因為 oninput 頻率很高
             if (el) {
                 el.value = val;
                 const labels = ['低','偏低','標準','偏高','高'];
@@ -695,7 +683,6 @@
             if (!currentUser) return;
 
             try {
-                // 路徑修正: artifacts/{appId}/public/data/decisions
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'decisions'), {
                     site: window.teamState.site,
                     scores: calcScore(true),
@@ -714,11 +701,9 @@
             }
         }
 
-        // --- 核心算法 (Core Logic) ---
         const sites = { 'A': {s:85,e:20,o:95}, 'B': {s:50,e:95,o:15}, 'C': {s:70,e:60,o:55} };
         
         function calcScoreStatic(st) {
-            // 防止數據尚未載入
             if (!st || !st.site) return { s:0, e:0, o:0, total:0 };
             
             const base = sites[st.site] || sites['A'];
@@ -760,7 +745,6 @@
         function updateAdminCharts(teams, stats) {
             const count = teams.length || 1;
             
-            // Pie Chart
             if(!adminPie) {
                 const ctx = document.getElementById('adminPieChart').getContext('2d');
                 adminPie = new Chart(ctx, { 
@@ -784,7 +768,6 @@
             adminPie.data.datasets[0].data = [stats.A, stats.B, stats.C]; 
             adminPie.update();
 
-            // Bar Chart
             if(!adminBar) {
                 const ctx = document.getElementById('adminBarChart').getContext('2d');
                 adminBar = new Chart(ctx, { 
@@ -846,6 +829,14 @@
                 });
             }
             lucide.createIcons();
+        };
+
+        window.dismissIntro = () => {
+            const intro = document.getElementById('intro-splash');
+            intro.classList.add('fade-out-up');
+            
+            setTimeout(() => {
+            }, 800);
         };
     </script>
 </body>
