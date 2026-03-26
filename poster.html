@@ -21,7 +21,8 @@
         /* A3/Poster Size Ratio */
         .poster {
             width: 297mm;
-            min-height: 420mm;
+            /* min-height: 420mm;  <-- 移除固定高度，改為自動 */
+            height: auto;       /* <-- 讓高度隨內容調整 */
             background: #0f172a; /* Slate 900 */
             color: white;
             position: relative;
@@ -29,6 +30,7 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             display: flex;
             flex-direction: column;
+            padding-bottom: 2rem; /* 為了給最下方的 Designed by 留點空間 */
         }
 
         .font-tech { font-family: 'Zen Dots', cursive; }
@@ -49,7 +51,7 @@
 
         @media print {
             body { padding: 0; background: none; }
-            .poster { width: 100%; min-height: 100vh; box-shadow: none; }
+            .poster { width: 100%; height: auto; box-shadow: none; }
             .no-print { display: none; }
         }
     </style>
@@ -88,7 +90,8 @@
         </header>
 
         <!-- Main Visual Area -->
-        <div class="relative z-10 p-12 flex-1 grid grid-cols-12 gap-8">
+        <!-- 移除 flex-1 以避免它強制佔據空間 -->
+        <div class="relative z-10 p-12 grid grid-cols-12 gap-8">
             
             <!-- Left: Features -->
             <div class="col-span-12 lg:col-span-7 flex flex-col justify-center space-y-10">
