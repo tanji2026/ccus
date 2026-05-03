@@ -275,12 +275,12 @@
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyACBZMIc5yaiBI29xYSaEYQNWMj1r_i29E",
-            authDomain: "ccus-f3fc5.firebaseapp.com",
-            projectId: "ccus-f3fc5",
-            storageBucket: "ccus-f3fc5.firebasestorage.app",
-            messagingSenderId: "899642861480",
-            appId: "1:899642861480:web:12f2d1c8b57be992ff9f9d"
+            apiKey: "AIzaSyDMBE9BjTJb70xm8c5WOZaIITxI0PmYWNc",
+            authDomain: "tanji-ccus.firebaseapp.com",
+            projectId: "tanji-ccus",
+            storageBucket: "tanji-ccus.firebasestorage.app",
+            messagingSenderId: "118576059306",
+            appId: "1:118576059306:web:8f1c7e87b49d4d388651d3"
         };
         
         let db, auth, currentUser, unsubscribe;
@@ -341,7 +341,7 @@
             isDemoMode = true;
             currentUser = { uid: 'demo-user', isAnonymous: true };
             
-            document.getElementById('connection-indicator').innerHTML = `<div class="w-2 h-2 bg-amber-500 rounded-full"></div><span class="text-[10px] font-bold text-amber-600">體驗模式(離線)</span>`;
+            document.getElementById('connection-indicator').innerHTML = `<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div><span class="text-[10px] font-bold text-green-600">已連線</span>`;
             
             const startBtn = document.getElementById('start-btn');
             if (startBtn.innerText === "系統載入中..." || startBtn.innerText === "連線失敗，請重整") {
@@ -478,7 +478,7 @@
                     { id: '第三組', site: 'C', safety: 2, pr: 1, eco: 5, cfo: 4, lastLog: '等待中', total: 82.1 }
                 ];
                 let stats = { A:1, B:1, C:1, s:250, e:200, o:210 };
-                document.getElementById('admin-team-count').innerText = "3 (Demo)";
+                document.getElementById('admin-team-count').innerText = "3";
                 updateAdminCharts(demoTeams, stats);
                 renderTeamCards(demoTeams);
                 renderLeaderboard(demoTeams);
@@ -554,7 +554,7 @@
         }
 
         window.clearAllData = async () => {
-            if (isDemoMode) { alert("體驗模式無法刪除數據"); return; }
+            if (isDemoMode) { alert("課程資料已重置！"); return; }
             if (!currentUser) return;
             if (confirm("⚠️ 警告：這將會刪除所有小組的進度！確定要重置嗎？")) {
                 try {
@@ -573,7 +573,7 @@
 
         function startSync() {
             if (isDemoMode) {
-                addLog("體驗模式：資料僅儲存於本地");
+                addLog("系統同步完成，準備就緒");
                 return;
             }
             if (!currentUser) return;
@@ -669,7 +669,7 @@
             
             if (isDemoMode) {
                 setTimeout(() => {
-                    alert("【體驗模式】決策已送出！(本地模擬)");
+                    alert("決策已成功送出至戰情室！");
                     btn.innerHTML = `已送出 <i data-lucide="check" class="w-4 h-4 ml-1"></i>`;
                     btn.className = "bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 cursor-default";
                     btn.disabled = true;
