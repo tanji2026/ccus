@@ -77,52 +77,54 @@
 
     </div>
 
-    <div id="login-screen" class="fixed inset-0 bg-slate-900 z-50 flex flex-col items-center justify-center p-6 text-white transition-opacity duration-500 overflow-y-auto">
-        <div class="w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl shadow-emerald-500/50 mt-auto lg:mt-0">
-            <i data-lucide="leaf" class="w-8 h-8 text-white"></i>
-        </div>
-        <h1 class="text-3xl font-black mb-2 tracking-tight">碳吉 TanJi</h1>
-        <p class="text-slate-400 mb-8 text-sm">CCUS 淨零決策模擬系統</p>
-        
-        <div class="w-full max-w-sm space-y-4">
-            <div>
-                <label class="text-xs font-bold text-slate-400 uppercase ml-1">小組名稱 / 教師代碼</label>
-                <input type="text" id="login-team" placeholder="輸入小組名稱" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 text-white font-bold focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+    <div id="login-screen" class="fixed inset-0 bg-slate-900 z-50 flex flex-col p-6 text-white transition-opacity duration-500 overflow-y-auto">
+        <div class="flex-grow flex flex-col items-center justify-center w-full max-w-sm mx-auto min-h-max py-10">
+            <div class="w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center mb-6 shadow-2xl shadow-emerald-500/50">
+                <i data-lucide="leaf" class="w-8 h-8 text-white"></i>
             </div>
+            <h1 class="text-3xl font-black mb-2 tracking-tight">碳吉 TanJi</h1>
+            <p class="text-slate-400 mb-8 text-sm">CCUS 淨零決策模擬系統</p>
             
-            <div id="role-selector" class="transition-all duration-300">
-                <label class="text-xs font-bold text-slate-400 uppercase ml-1">選擇您的角色</label>
-                <div class="grid grid-cols-2 gap-2 mt-1">
-                    <button onclick="selectRole('engineer')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group" data-role="engineer">
-                        <div class="text-xl mb-1">🔧</div>
-                        <div class="text-xs font-bold text-slate-300 group-hover:text-white">環境工程師</div>
-                    </button>
-                    <button onclick="selectRole('cfo')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group" data-role="cfo">
-                        <div class="text-xl mb-1">💰</div>
-                        <div class="text-xs font-bold text-slate-300 group-hover:text-white">財務長</div>
-                    </button>
-                    <button onclick="selectRole('pr')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group" data-role="pr">
-                        <div class="text-xl mb-1">📢</div>
-                        <div class="text-xs font-bold text-slate-300 group-hover:text-white">公關經理</div>
-                    </button>
-                    <button onclick="selectRole('eco')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group" data-role="eco">
-                        <div class="text-xl mb-1">🌱</div>
-                        <div class="text-xs font-bold text-slate-300 group-hover:text-white">生態保育員</div>
-                    </button>
-                    <button onclick="selectRole('policy')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group col-span-2" data-role="policy">
-                        <div class="text-xl mb-1 flex items-center gap-2">📜 <span class="text-xs bg-emerald-900 text-emerald-400 px-1.5 rounded">隊長</span></div>
-                        <div class="text-xs font-bold text-slate-300 group-hover:text-white">政策分析師</div>
-                    </button>
+            <div class="w-full space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase ml-1">小組名稱 / 教師代碼</label>
+                    <input type="text" id="login-team" placeholder="輸入小組名稱" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 text-white font-bold focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
                 </div>
-            </div>
+                
+                <div id="role-selector" class="transition-all duration-300">
+                    <label class="text-xs font-bold text-slate-400 uppercase ml-1">選擇您的角色</label>
+                    <div class="grid grid-cols-2 gap-2 mt-1">
+                        <button onclick="selectRole('engineer')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group" data-role="engineer">
+                            <div class="text-xl mb-1">🔧</div>
+                            <div class="text-xs font-bold text-slate-300 group-hover:text-white">環境工程師</div>
+                        </button>
+                        <button onclick="selectRole('cfo')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group" data-role="cfo">
+                            <div class="text-xl mb-1">💰</div>
+                            <div class="text-xs font-bold text-slate-300 group-hover:text-white">財務長</div>
+                        </button>
+                        <button onclick="selectRole('pr')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group" data-role="pr">
+                            <div class="text-xl mb-1">📢</div>
+                            <div class="text-xs font-bold text-slate-300 group-hover:text-white">公關經理</div>
+                        </button>
+                        <button onclick="selectRole('eco')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group" data-role="eco">
+                            <div class="text-xl mb-1">🌱</div>
+                            <div class="text-xs font-bold text-slate-300 group-hover:text-white">生態保育員</div>
+                        </button>
+                        <button onclick="selectRole('policy')" class="role-btn bg-slate-800 border border-slate-700 p-3 rounded-xl text-left hover:border-emerald-500 transition-all group col-span-2" data-role="policy">
+                            <div class="text-xl mb-1 flex items-center gap-2">📜 <span class="text-xs bg-emerald-900 text-emerald-400 px-1.5 rounded">隊長</span></div>
+                            <div class="text-xs font-bold text-slate-300 group-hover:text-white">政策分析師</div>
+                        </button>
+                    </div>
+                </div>
 
-            <button id="start-btn" onclick="enterSimulation()" disabled class="w-full bg-slate-700 text-slate-500 py-4 rounded-xl font-bold mt-4 transition-all shadow-lg">
-                系統載入中...
-            </button>
+                <button id="start-btn" onclick="enterSimulation()" disabled class="w-full bg-slate-700 text-slate-500 py-4 rounded-xl font-bold mt-4 transition-all shadow-lg">
+                    系統載入中...
+                </button>
+            </div>
         </div>
         
-        <div class="mt-8 mb-4 lg:absolute lg:bottom-6 text-[10px] text-slate-600 font-bold text-center w-full px-4">
-            115年度第二屆CCUS創意教案｜作品受著作權法保護，未經授權請勿複製轉載｜歡迎聯絡我們：tanji2026@gmail.com
+        <div class="w-full text-[10px] text-slate-600 font-bold text-center pb-4 leading-relaxed">
+            115年度第二屆CCUS創意教案<br class="md:hidden">｜作品受著作權法保護，未經授權請勿複製轉載｜<br class="md:hidden">歡迎聯絡我們：tanji2026@gmail.com
         </div>
     </div>
 
@@ -144,7 +146,7 @@
         </div>
     </nav>
 
-    <main id="main-student" class="flex-1 overflow-y-auto p-4 pb-40 no-scrollbar relative hidden">
+    <main id="main-student" class="flex-1 overflow-y-auto p-4 pb-32 lg:pb-12 no-scrollbar relative hidden">
         <div class="container mx-auto max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div class="lg:col-span-7 space-y-4">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
@@ -205,10 +207,10 @@
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="mt-8 text-center text-[10px] text-slate-400 pb-28 lg:pb-4">
-            115年度第二屆CCUS創意教案｜作品受著作權法保護，未經授權請勿複製轉載｜歡迎聯絡我們：tanji2026@gmail.com
+            
+            <div class="lg:col-span-12 mt-8 text-center text-[10px] text-slate-400 leading-relaxed">
+                115年度第二屆CCUS創意教案<br class="md:hidden">｜作品受著作權法保護，未經授權請勿複製轉載｜<br class="md:hidden">歡迎聯絡我們：tanji2026@gmail.com
+            </div>
         </div>
     </main>
 
@@ -248,8 +250,8 @@
             <h3 class="font-bold text-slate-300 mb-4 flex items-center gap-2"><i data-lucide="grid" class="w-4 h-4"></i> 各組即時狀態</h3>
             <div id="team-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
             
-            <div class="mt-12 text-center text-[10px] text-slate-600">
-                115年度第二屆CCUS創意教案｜作品受著作權法保護，未經授權請勿複製轉載｜歡迎聯絡我們：tanji2026@gmail.com
+            <div class="mt-12 text-center text-[10px] text-slate-600 pb-8 leading-relaxed">
+                115年度第二屆CCUS創意教案<br class="md:hidden">｜作品受著作權法保護，未經授權請勿複製轉載｜<br class="md:hidden">歡迎聯絡我們：tanji2026@gmail.com
             </div>
         </div>
     </main>
