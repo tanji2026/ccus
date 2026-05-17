@@ -457,8 +457,28 @@
             calcScore();
         }
 
+        function unlockUI(id) {
+            const slider = document.getElementById(`slider-${id}`);
+            if (slider) slider.disabled = false;
+            const lockOverlay = document.getElementById(`lock-${id}`);
+            if (lockOverlay) { lockOverlay.classList.add('hidden'); lockOverlay.classList.remove('flex'); }
+        }
+
+        function lockUI(id) {
+            const slider = document.getElementById(`slider-${id}`);
+            if (slider) slider.disabled = true;
+            const lockOverlay = document.getElementById(`lock-${id}`);
+            if (lockOverlay) { lockOverlay.classList.remove('hidden'); lockOverlay.classList.add('flex'); }
+        }
+
         function applyPermissions() {
             const r = window.userState.role;
+            
+            unlockUI('safety');
+            unlockUI('eco');
+            unlockUI('pr');
+            unlockUI('cfo');
+
             if (r !== 'engineer') lockUI('safety');
             if (r !== 'pr') lockUI('pr');
             if (r !== 'eco') lockUI('eco');
@@ -477,13 +497,6 @@
                     document.getElementById('submit-btn-icon').setAttribute('data-lucide', 'lock');
                 }
             }
-        }
-
-        function lockUI(id) {
-            const slider = document.getElementById(`slider-${id}`);
-            if (slider) slider.disabled = true;
-            const lockOverlay = document.getElementById(`lock-${id}`);
-            if (lockOverlay) { lockOverlay.classList.remove('hidden'); lockOverlay.classList.add('flex'); }
         }
 
         function startSync() {
